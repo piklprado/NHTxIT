@@ -3,6 +3,7 @@
 ## errors and mean M-type errors  
 source("functions.R")
 library(parallel)
+
 ## Number of hypercube samples
 nsampH <- 2000
 ## Number of replicate simulations for each parameter sample in the hypercube
@@ -12,8 +13,7 @@ nrepl <- 1e4
 ## t-test simulations
 ################################################################################
 ## Hypercube sampling (see introductory vignette of pse package)
-## Variables to be sampled: effect, standandard effect, sample size
-## Variables to be sampled: standard effect (as tvalues), standandard error, sample size
+## Variables to be sampled: standard effect (as t-values), standandard error, sample size
 factors <- c("D", "SE", "N")
 ## Discrete uniform random deviates function, to sample discrete
 ## sample sizes
@@ -22,43 +22,16 @@ qdunif<-function(p, min, max) floor(qunif(p, min, max))
 q <- c("qunif", "qunif", "qdunif")
 ## Arguments of each distribution (min and max values of the uniform distributions)
 q.arg <- list(list(min=0.1, max=3), list(min=0.1, max=1), list(min=5, max=100))
-## To run the sampling simulation many times
-## Acessory function to replicate runs with each combination de parameters 
-## f.ttest <- function(effect.size, standard.effect, sample.size, nrep ){
-##     standard.error <- effect.size/standard.effect
-##     f2 <- function(...) wp.ttest(...)[c("M.error", "S.error",
-##                                         "NHT.right", "AIC.right", "p.agreement")]
-##     raw <- replicate(nrep, mapply(f2, effect.size,
-##                                   standard.error, sample.size),
-##                                   simplify=TRUE)
-##     results <- c(sum(raw[3,])/nrep,
-##                  sum(raw[4,])/nrep,
-##                  sum(raw[3,]!=raw[4,])/nrep,
-##                  mean(raw[1,raw[3,]==1], na.rm=TRUE),
-##                  mean(raw[2,raw[3,]==1], na.rm=TRUE),
-##                  mean(raw[1,raw[4,]==1], na.rm=TRUE),
-##                  mean(raw[2,raw[4,]==1], na.rm=TRUE))
-##     names(results) <- c("p.NHT.right", "p.AIC.right", "p.mismatch","mean.NHT.M",
-##                         "p.NHT.S", "mean.AIC.M", "p.AIC.S")
-##     return(results)
-## }
-## ## Accessory function for a single run wit a combination of parameters
-## modelRun <- function (my.data) {
-##     return(mapply(f.ttest, my.data[,1], my.data[,2], my.data[,3],
-##                   MoreArgs = list(nrep = nrepl)))
-## }
-
 ## Accessory function for a single run with a combination of parameters
 modelRun <- function (my.data) {
     return(mapply(sim.averages, my.data[,1], my.data[,2], my.data[,3],
                   MoreArgs = list(nrep = nrepl, function.name="wp.ttest")))
 }
-
 ## Hypercube sample of nsamp combinations of parameters
 ## Start cluster (set the file mpd.hosts with the desired number of
 ## cores and processes, see pse:machinefile)
-cl <- makePSOCKcluster(machinefile("../mpd.hosts"))
-## cl <- makePSOCKcluster(machinefile("mpd.hosts"))
+## cl <- makePSOCKcluster(machinefile("../mpd.hosts"))
+cl <- makePSOCKcluster(machinefile("mpd.hosts"))
 ## Export needed functions
 ##clusterEvalQ(cl, source("functions.R"))
 clusterExport(cl, c("nrepl", "AICc", "wp.ttest", "sim.averages"))
@@ -82,7 +55,7 @@ names(t.results.d2)[4:12] <- c("p.NHT.right", "p.AIC.right", "p.mismatch","mean.
 save.image()
 ## Stop cluster
 stopCluster(cl)
-## Save results
+## Save results in separated binary
 save(t.results, t.results.d2, file="tresults.RData")
 
 
@@ -94,8 +67,7 @@ save(t.results, t.results.d2, file="tresults.RData")
 nsampH <- 2000
 ## Number of replicate simulations for each parameter sample in the hypercube
 nrepl <- 1e4
-## Variables to be sampled: effect, standandard effect, sample size
-## Variables to be sampled: standard effect (as tvalues), standandard error, sample size
+## Variables to be sampled: standard effect (as tvalues), standandard error of marginal distributions, sample size
 factors <- c("D", "SE", "N")
 ## Discrete uniform random deviates function, to sample discrete
 ## sample sizes
@@ -112,8 +84,8 @@ modelRun <- function (my.data) {
 ## Hypercube sample of nsamp combinations of parameters
 ## Start cluster (set the file mpd.hosts with the desired number of
 ## cores and processes, see pse:machinefile)
-cl <- makePSOCKcluster(machinefile("../mpd.hosts"))
-## cl <- makePSOCKcluster(machinefile("mpd.hosts"))
+## cl <- makePSOCKcluster(machinefile("../mpd.hosts"))
+cl <- makePSOCKcluster(machinefile("mpd.hosts"))
 ## Export needed functions
 ##clusterEvalQ(cl, source("functions.R"))
 clusterExport(cl, c("nrepl", "AICc", "wp.cortest", "sim.averages", "rmvnorm", "dmvnorm"))
