@@ -1,0 +1,6 @@
+*.~
+*~
+*.RData
+.RData
+.Rhistory
+*.pdf
