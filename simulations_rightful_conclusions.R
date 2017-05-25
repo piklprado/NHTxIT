@@ -14,14 +14,14 @@ nrepl <- 1e4
 ################################################################################
 ## Hypercube sampling (see introductory vignette of pse package)
 ## Variables to be sampled: standard effect (as t-values), standandard error, sample size
-factors <- c("D", "SE", "N")
+factors <- c("D", "SD", "N")
 ## Discrete uniform random deviates function, to sample discrete
 ## sample sizes
 qdunif<-function(p, min, max) floor(qunif(p, min, max))
 ## Distributions to sample the variables; all uniform in this case
 q <- c("qunif", "qunif", "qdunif")
 ## Arguments of each distribution (min and max values of the uniform distributions)
-q.arg <- list(list(min=0.1, max=3), list(min=0.1, max=1), list(min=5, max=100))
+q.arg <- list(list(min=0.1, max=5), list(min=0.1, max=5), list(min=5, max=100))
 ## Accessory function for a single run with a combination of parameters
 modelRun <- function (my.data) {
     return(mapply(sim.averages, my.data[,1], my.data[,2], my.data[,3],
@@ -68,14 +68,14 @@ nsampH <- 2000
 ## Number of replicate simulations for each parameter sample in the hypercube
 nrepl <- 1e4
 ## Variables to be sampled: standard effect (as tvalues), standandard error of marginal distributions, sample size
-factors <- c("D", "SE", "N")
+factors <- c("D", "SD", "N")
 ## Discrete uniform random deviates function, to sample discrete
 ## sample sizes
 qdunif<-function(p, min, max) floor(qunif(p, min, max))
 ## Distributions to sample the variables; all uniform in this case
 q <- c("qunif", "qunif", "qdunif")
 ## Arguments of each distribution (min and max values of the uniform distributions)
-q.arg <- list(list(min=0.1, max=15), list(min=0.1, max=1), list(min=5, max=100))
+q.arg <- list(list(min=0.1, max=10), list(min=0.1, max=5), list(min=10, max=100))
 ## Accessory function for a single run with a combination of parameters
 modelRun <- function (my.data) {
     return(mapply(sim.averages, my.data[,1], my.data[,2], my.data[,3],
@@ -106,7 +106,7 @@ modelRun <- function (my.data) {
 myLHS2.d2 <- LHS(modelRun, factors, nsampH, q, q.arg, cl=cl)
 ## dataframe with parameter values and results
 cor.results.d2 <- cbind(get.data(myLHS2.d2),  get.results(myLHS2.d2))
-names(cor.results,d2)[4:12] <- c("p.NHT.right", "p.AIC.right", "p.mismatch","mean.NHT.M", "mean.AIC.M",
+names(cor.results.d2)[4:12] <- c("p.NHT.right", "p.AIC.right", "p.mismatch","mean.NHT.M", "mean.AIC.M",
                               "p.NHT.S",  "p.AIC.S", "mean.pvalue", "mean.wH0")
 ## Adds Pearson correlation coeff values to the results (which is a function of tval and N)
 cor.results.d2$rpears <- with(get.data(myLHS2.d2), D/sqrt(N-2+D^2))

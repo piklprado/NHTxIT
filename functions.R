@@ -14,8 +14,7 @@ library(mvtnorm)
 #'     expressesed as a t-value (difference between true means divided
 #'     by the standard error of the difference). Ignored if \code{mu2}
 #'     is provided
-#' @param se1 real positive, standard error of the effect
-#'     size. Internally converted to the deviation of the Gaussian
+#' @param sd1 real positive, standard deviation of the Gaussian
 #'     populations from which the samples are drawn.
 #' @param N integer positive, size of the two samples.
 #' @param mu2 real number, the mean of one of the Gaussian populations
@@ -55,16 +54,16 @@ library(mvtnorm)
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651.
-wp.ttest <- function(tval, se1, N, mu2, delta2=FALSE){
-    sd1 <- se1*sqrt(2*N)
+wp.ttest <- function(tval, sd1, N, mu2, delta2=FALSE){
+    # sd1 <- se1*sqrt(2*N)
     if(missing(mu2))
         delta <- tval*sd1*sqrt(2/N)
     if(missing(tval))
         delta <-  mu2
-    x1 <- rnorm(N, sd=sd1)
-    x2 <- rnorm(N, mean = delta, sd=sd1)
-    pvalue <- t.test(x1, x2, var.equal=TRUE)$p.value
-    y <- factor(rep(c("am1","am2"), each=N))
+    x1 <- rnorm(N, sd = sd1)
+    x2 <- rnorm(N, mean = delta, sd = sd1)
+    pvalue <- t.test(x1, x2, var.equal = TRUE)$p.value
+    y <- factor(rep(c("am1","am2"), each = N))
     m1 <- lm(c(x1,x2) ~ 1)
     m2 <- lm(c(x1,x2)~ y)
     AICs <- c(AICc(m1, nobs=2*N), AICc(m2, nobs=2*N))
@@ -108,9 +107,7 @@ wp.ttest <- function(tval, se1, N, mu2, delta2=FALSE){
 #' covariance parameter free or set to zero.
 #' @param tval real number, the true value of  correlation coefficient
 #' expressed as a t-value (t = r sqrt((n-2)/(1-r^2))).
-#' @param se1 real positive, standard error of samples taken from each
-#'     marginal distribution, from which is
-#'     calculated the standard
+#' @param sd1 real positive, standard
 #'     deviations of the marginal Gaussian
 #'     populations from which the samples are drawn.
 #' @param N integer positive, size of the two samples.
@@ -151,10 +148,10 @@ wp.ttest <- function(tval, se1, N, mu2, delta2=FALSE){
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651. 
-wp.cortest <- function(tval, se1, N, rpears, delta2=FALSE){
+wp.cortest <- function(tval, sd1, N, rpears, delta2=FALSE){
     if(missing(rpears))
         rpears <- tval/sqrt(N - 2 + tval^2)
-    sd1 <- se1*sqrt(N)
+    ## sd1 <- se1*sqrt(N)
     cov1 <- rpears*sd1^2
     sigma <- matrix(c(sd1^2, cov1, cov1, sd1^2), nrow=2)
     x <- rmvnorm(n = N, sigma=sigma)
@@ -400,12 +397,11 @@ wp.lm <- function(rpears, beta, se1, N){
 
 
 ## Experimental: function to run replicates of any function above for
-## a given combination of parameters standard effect, standard errors
+## a given combination of parameters standard effect, standard deviations
 ## and sample sizes and the simulation function to run
-sim.averages <- function(effect, standard.error, sample.size, nrep, function.name, delta2=FALSE){
+sim.averages <- function(effect, st.dev, sample.size, nrep, function.name, delta2=FALSE){
     f1 <- get(function.name)
-    ## standard.error <- effect.size/standard.effect
-    raw <- replicate(nrep, mapply(f1, effect, standard.error, sample.size, delta2=delta2),
+    raw <- replicate(nrep, mapply(f1, effect, st.dev, sample.size, delta2=delta2),
                      simplify=TRUE)
     results <- c(sum(raw[6,])/nrep, # Prop rightful conclusions NHT
                  sum(raw[7,])/nrep, # Prop rightfull conclusions IT
