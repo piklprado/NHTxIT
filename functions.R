@@ -20,10 +20,10 @@ library(mvtnorm)
 #' @param mu2 real number, the mean of one of the Gaussian populations
 #'     from which the samples are drawn.  The mean of the other
 #'     population is set to zero.
-#' @param delta2 logical; should null hypothesis be rejected only if
-#'     deltaAIC of the alternative hypothesis is larger than two? If FALSE the null
-#'     hypothesis is rejected if it has larger deltaAIC than
-#'     alternative.
+#' @param delta2 logical; should null hypothesis be rejected only if it has a value of 
+#'     deltaAIC larger than two? If FALSE the null
+#'     hypothesis is rejected if it has a larger deltaAIC value than the
+#'     alternative, even if deltaAIC<2.
 #' @return a vector of length 7: the p-value of a two-tailed t-test
 #'     for the null hypothesis that the two samples come from the same
 #'     distributions; the Akaike evidence weight of the null
@@ -71,7 +71,7 @@ wp.ttest <- function(tval, sd1, N, mu2, delta2=FALSE){
     if(delta==0){
         S.error <- NA
         M.error <- NA
-        nht.right <- pvalue > 0.05
+        nht.right <- pvalue >= 0.05
         if(delta2)
             aic.right <- dAICs[2] > 2
         else
@@ -113,16 +113,15 @@ wp.ttest <- function(tval, sd1, N, mu2, delta2=FALSE){
 #' @param N integer positive, size of the two samples.
 #' @param rpears real number, the true Pearson correlation between the two
 #'     variables sampled. If missing calculated from \code{tval}.
-#' @param delta2 logical; should null hypothesis be rejected only if
-#'     deltaAIC of the alternative hypothesis is larger than two? If FALSE the null
-#'     hypothesis is rejected if it has larger deltaAIC than
-#'     alternative.
+#' @param delta2 logical; should null hypothesis be rejected only if it has a value of 
+#'     deltaAIC larger than two? If FALSE the null
+#'     hypothesis is rejected if it has a larger deltaAIC value than the
+#'     alternative, even if deltaAIC<2.
 #' @return a vector with of size 7: the p-value of a correlation
 #'     t-test (\code{cor.test} for the
 #'     null hypothesis that the two samples come from independent
 #'     distributions (zero correlation); and the Akaike evidence weight of the null
-#'     hypothesis compared to the alternative model that the
-#' samples come from a bivariate Gaussian with some degree of
+#'     hypothesis compared to the alternative model that the samples come from a bivariate Gaussian with some degree of 
 #'     correlation; the difference between Akaike Information Criteria of the null
 #'     to the alternative hypothesis; and the ratio between the
 #'     estimated correlation and the true value if
@@ -169,7 +168,7 @@ wp.cortest <- function(tval, sd1, N, rpears, delta2=FALSE){
     if(rpears == 0){
         M.error <-  NA
         S.error <-  NA
-        nht.right <- p.value > 0.05
+        nht.right <- p.value >= 0.05
         if(delta2)
             aic.right <- dAICs[2] > 2
         else
@@ -205,6 +204,10 @@ wp.cortest <- function(tval, sd1, N, rpears, delta2=FALSE){
 #' the AIC of linear models with or without a group label as
 #' predictors.
 #'
+#' @param std.diff real number, the true difference or effect size
+#'     expresseed as a t-value (difference between true mean of tretament one and treatment 2 divided
+#'     by the standard error of the difference). Ignored if \code{mu1}
+#'     is provided
 #' @param mu1 real number, the mean of one of the Gaussian populations from which the samples are drawn.
 #' The mean of the other two populations is set to zero.
 #' @param se1 real positive, standard error of the effect, from which
@@ -212,6 +215,10 @@ wp.cortest <- function(tval, sd1, N, rpears, delta2=FALSE){
 #'     the standard deviation of the Gaussian
 #'     populations from which the samples are drawn.
 #' @param N integer positive, size of the three samples.
+#' @param delta2 logical; should null hypothesis be rejected only if it has a
+#'     deltaAIC larger than two? If FALSE the null
+#'     hypothesis is rejected if it has larger deltaAIC than
+#'     the alternative hypothesis.
 #' @return a vector of length 7: the p-value of a F-test for the
 #'     null hypothesis that the three samples come from the same
 #'     distribution; the Akaike evidence weight of the null
@@ -227,7 +234,7 @@ wp.cortest <- function(tval, sd1, N, rpears, delta2=FALSE){
 #' @details This function simulates samples of the same size \code{N}
 #'     drawn from Gaussian distributions with the same standard
 #'     deviation \code{sd1}. The mean of one of the distributions distributions differ
-#'     according to the true mean of one group indicated by the argument 
+#'     according to the standardized effect (or alternatively the true mean) of one group indicated by the argument 
 #'     \code{mu1}, given that the mean of the other two groups is zero.
 #'     The null hypothesis that the samples come from
 #'     the same distribution is then evaluated by a F-test and a Tukey
@@ -244,8 +251,8 @@ wp.cortest <- function(tval, sd1, N, rpears, delta2=FALSE){
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651. 
-wp.anova <- function(std.diff, mu1, se1, N){
-    sd1 <- se1*sqrt(N*3)
+wp.anova <- function(std.diff, sd1, N, mu1, delta2=FALSE){
+    ## sd1 <- se1*sqrt(N*3)
     if(missing(mu1))
         delta <- std.diff*sd1*sqrt(3/N)
     if(missing(std.diff))
@@ -269,7 +276,7 @@ wp.anova <- function(std.diff, mu1, se1, N){
             aov.right <- FALSE
     }
     if(mu1 == 0) {
-        aov.right <- pF > 0.05
+        aov.right <- pF >= 0.05
     }
     m0 <- lm( x ~ 1)
     m123 <- lm( x ~ y)
@@ -277,23 +284,28 @@ wp.anova <- function(std.diff, mu1, se1, N){
     m2 <-lm( x ~ y2)
     m3 <-lm( x ~ y3)
     AICs <- c(AICc(m0, nobs=3*N),
-        AICc(m1, nobs=3*N),
-        AICc(m2, nobs=3*N),
-        AICc(m3, nobs=3*N),
-        AICc(m123, nobs=3*N))
+              AICc(m1, nobs=3*N),
+              AICc(m2, nobs=3*N),
+              AICc(m3, nobs=3*N),
+              AICc(m123, nobs=3*N))
     dAICs <- AICs - min(AICs)
     if(mu1 != 0){
         M.error <- coef(m3)[2]/mu1
         S.error <- M.error < 0
-        aic.right <- dAICs[4]==0 & all(dAICs[-4]>2)
-        agr1 <- (dAICs[4]==0 & all(dAICs[-4]>2))
-        }
+        if(delta2)
+            aic.right <- dAICs[4]==0 & all(dAICs[-4]>2)
+        ## agr1 <- (dAICs[4]==0 & all(dAICs[-4]>2))
+        else
+            aic.right <- dAICs[4]==0
+    }
     if(mu1 == 0){
         M.error <-  NA
         S.error <- NA
-        ##aic.right <- dAICs[1]==0 & all(dAICs[-1]>2
-        aic.right <- dAICs[1] < 2
-    agr0 <-  (pF > 0.05 & dAICs[1] < 2)
+        if(delta2)
+            aic.right <- dAICs[1]==0 & all(dAICs[-1]>2)
+        else                                   
+            aic.right <- dAICs[1] < 2
+        ##agr0 <-  (pF >= 0.05 & dAICs[1] < 2)
     }
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
@@ -323,14 +335,23 @@ wp.anova <- function(std.diff, mu1, se1, N){
 #' is spoted as a true effect, or if the null hypothesis is identified
 #' in the absence of effects (beta = 0)
 #'
-#' @param rpears real number, Pearson correlation coefficient between
-#'     the two variables to be tested as predictors (aka independent variables).
+#' @param std.beta real number, standardized effect (aka standardized
+#'     slope coefficient) of the first predictor
+#'     on the response variable (aka dependent variable). Ignored if
+#'     bet is provided.
 #' @param beta real number, effect (aka slope) of the first predictor
 #'     on the response variable (aka dependent variable).
-#' @param se1 real positive, standard error of the effect, from which
-#'     is calculated the satandard deviation of the Gaussian of the
-#'     response variable.
+#' @param sd1 real positive, standard deviation of the effect, which
+#'     is the standard deviation of the Gaussian of the response variable.
 #' @param N integer positive, size of the sample.
+#' @param rpears real number, Pearson correlation coefficient between
+#'     the two variables to be tested as predictors (aka independent
+#'     variables). Values of  \code{rpears} different from zero
+#'     creates collinearity between the two predictor variables.
+#' @param delta2 logical; should null hypothesis be rejected only if it has a
+#'     deltaAIC larger than two? If FALSE the null
+#'     hypothesis is rejected if it has larger deltaAIC than
+#'     the alternative hypothesis.
 #' @return a vector with of size 7: the p-value of a F-test for the
 #'     null hypothesis of no effect; the Akaike evidence weight of the null
 #'     hypothesis compared to the alternative models of effect of each
@@ -342,24 +363,25 @@ wp.anova <- function(std.diff, mu1, se1, N){
 #'     and M type errors, Gelman & Carlin, 2014), if the null hypothesis test
 #'     reached to the right conclusion (yes=1, 
 #'     no=0), if the model selection based on AICs reached to the right conclusion.
-#' @details This function samples two predictor variables form a
+#' @details This function samples two predictor variables from a
 #'     bivariate Gaussian with correlation term set by the user. The
 #'     marginal distributions of both predictors are standard
 #'     Gaussians (zero mean and unity standard error). A response
 #'     variable is then simulated from a Gaussian distribution that
 #'     has the mean value proportional to the first predictor. The
 #'     proportionality factor is the effect, or slope , of the
-#'     predictor and is set with argument \code{beta}. The standard
-#'     deviation of the response is set by the user with argument
-#'     \code{sd1}. When there is an effect of the predictor (beta!=0)
-#'     It is alo calculated the ratio between the estimated and true
+#'     predictor and is set with argument \code{beta} or \{std.beta}. The standard
+#'     deviation of the response is set by the argument \code{sd1}. If
+#'     there is an effect of the predictor (beta!=0)
+#'     it is also calculated the ratio between the estimated and true
 #'     effect value (type M error, Gelman & Carlin 2014).
 #' 
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651. 
-wp.lm <- function(rpears, beta, se1, N){
-    sd1 <- se1*sqrt(N)
+wp.lm <- function(std.beta, sd1, N, beta, rpears, delta2=FALSE){
+    if(missing(beta)) beta <- std.beta*sd1/sqrt(N)
+    # sd1 <- se1*sqrt(N)
     sigma <- matrix(c(1, rpears, rpears, 1), nrow=2)
     x <- rmvnorm(n = N, sigma=sigma)
     y <- rnorm(length(x[,1]), mean = beta*x[,1], sd = sd1)
@@ -381,13 +403,19 @@ wp.lm <- function(rpears, beta, se1, N){
         M.error <- NA
         S.error <- NA
         nht.right <- p.vals[1]>0.05 & p.vals[2]>0.05
-        aic.right <- dAICs[1]==0 & all(dAICs[-1]>2)
+        if(delta2)
+            aic.right <- dAICs[1]==0 & all(dAICs[-1]>2)
+        else
+            aic.right <- dAICs[1]==0
     }
     else{
         M.error <-  coef(m12)[2]/beta
         S.error <- M.error < 0
         nht.right <- p.vals[1]<0.05 & p.vals[2]>0.05
-        aic.right <- dAICs[2]==0 & all(dAICs[-2]>2)
+        if(delta2)
+            aic.right <- dAICs[2]==0 & all(dAICs[-2]>2)
+        else
+            aic.right <- dAICs[2]==0
         }
     results <- c(pF, wi[1], dAICs[1], M.error, S.error, nht.right, aic.right)
     names(results) <- c("p.value.F", "Akaike.weight.H0", "deltaAIC.H0",
@@ -396,12 +424,14 @@ wp.lm <- function(rpears, beta, se1, N){
 }
 
 
-## Experimental: function to run replicates of any function above for
+## A function to run replicates of any function above for
 ## a given combination of parameters standard effect, standard deviations
 ## and sample sizes and the simulation function to run
-sim.averages <- function(effect, st.dev, sample.size, nrep, function.name, delta2=FALSE){
+sim.averages <- function(effect, st.dev, sample.size, nrep,
+                         function.name, delta2=FALSE, ...){
     f1 <- get(function.name)
-    raw <- replicate(nrep, mapply(f1, effect, st.dev, sample.size, delta2=delta2),
+    raw <- replicate(nrep, mapply(f1, effect, st.dev, sample.size,
+                                  delta2=delta2, ...),
                      simplify=TRUE)
     results <- c(sum(raw[6,])/nrep, # Prop rightful conclusions NHT
                  sum(raw[7,])/nrep, # Prop rightfull conclusions IT
