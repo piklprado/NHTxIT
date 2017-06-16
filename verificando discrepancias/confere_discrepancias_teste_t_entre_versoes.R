@@ -138,13 +138,15 @@ c(apply(results1[,6:7], 2, sum)/1000, apply(results2[,6:7], 2, sum)[-1]/1000)
 
 ################################################################################
 ## PARTE 4: repete as simulacoes da parte 3, mas com uma populacao gerada
-## pelo Crystal Ball, enviada pelo Leo 15/06/17
+## pelo Crystal Ball
 ## CONCLUSAO: os resultados continuam os mesmos.
 ################################################################################
+## Arquivo txt com as populacoes geradas pelo Crystall Ball, enviado pelo Leo 15/06/17
+## Nome original do arquivo era "N,1,1.txt"
 CB <- read.table("crystal_ball_N_1_1.txt", header=TRUE)
-## populacao de 10 mil observacoes gerada com difereneca entre medias =1 e desvio padrao =1
+## populacao de 10 mil observacoes gerada com diferenca entre medias=1 e desvio-padrao=1
 summary(CB)
-## Medias e sd populacionais ligeiramente diferentes, como era de se esperar
+## Medias e sd populacionais ligeiramente diferentes do teorico, como era de se esperar
 ## Mas nao acredito que isso faca diferenca
 apply(CB, 2, sd)
 apply(CB, 2, mean)
