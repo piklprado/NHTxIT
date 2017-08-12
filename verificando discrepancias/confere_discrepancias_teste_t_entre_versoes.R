@@ -142,7 +142,7 @@ c(apply(results1[,6:7], 2, sum)/1000, apply(results2[,6:7], 2, sum)[-1]/1000)
 ## CONCLUSAO: os resultados continuam os mesmos.
 ################################################################################
 ## Arquivo txt com as populacoes geradas pelo Crystall Ball, enviado pelo Leo 15/06/17
-## Nome original do arquivo era "N,1,1.txt"
+## Nome original do arquivo era "N,1,1.txt", mudei para facilitar leitura e manipulacao
 CB <- read.table("crystal_ball_N_1_1.txt", header=TRUE)
 ## populacao de 10 mil observacoes gerada com diferenca entre medias=1 e desvio-padrao=1
 summary(CB)
@@ -193,6 +193,9 @@ apply(results3, 2, sum)/nrow(results3)
 ################################################################################
 ## Parte 5 : compara com codigo original do Leo,
 ## Arquivo Scripts.docx, enviado 20/06/2017
+## CONCLUSAO: parece que a fonte da discrepancia eh o uso no codigo do Leo
+## do objeto N para duas coisas: tamanho de cada amostra e n total de observacoes
+## para o calculo do AIC
 ################################################################################
 ## Abaixo copiei o codigo para o teste t, tal como esta no arquivo do Leo
 ## Para o codigo fucnionar tenho que atribuir x1 e x2 as variaveis do arquivo Crystal Ball
@@ -238,10 +241,10 @@ leo.AIC2.right <- sum(Delta_aicc > 2)
 apply(results3, 2, sum)/nrow(results3)
 c("NHT IT"=leo.nht.right, "menor AIC"= leo.menorAIC.right, "IT dAIC>2" =leo.AIC2.right)/R
 
-### Acho que descobri: A expressão de AICc usa o totald e observacoes (soma dos tamanhos das amostras)
+### Acho que descobri: A expressão de AICc usa o total de observacoes (soma dos tamanhos das amostras)
 ## Mas o obejto N no codigo do Leo entra no sorteio das amostras como tamanho de cada amostra
 ## e depois este mesmo objeto N entra no calculo do AIC como total de observacoes
-## A solucao é ou sortear N/2 observacoes naa amostragem ou usar N*2 nos calculos do AIC
+## A solucao é ou sortear N/2 observacoes na amostragem ou usar N*2 nos calculos do AIC
 ## Verificando com a primeira oopcao
 N <- 20 ## agora é numero total de observacoes = soma dos tamanhos das duas amostras
 R=10000
