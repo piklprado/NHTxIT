@@ -1,5 +1,5 @@
 ## Na versao friendly review foi usado o critério do menor dletaAIC para identificar
-## a hipotes com mais suporte no teste t. A figura desta versao mostra
+## a hipoteses com mais suporte no teste t. A figura desta versao mostra
 ## que a proporcao de conclusoes corretas é um pouco maior para NHT,
 ## no caso de amostras pequenas e efeito pequeno. No entanto os novos
 ## codigos do PI mostram o contrario. Um resultado similar ao anterior
@@ -14,7 +14,7 @@
 ## arquivo com as funcoes que criei e estou usando para fazer os
 ## ultimos graficos que te enviei
 source("../functions.R")
-set.seed(42) ## para fazer os mesmos sorteior nod dois casos
+set.seed(42) ## para fazer os mesmos sorteio nos dois casos
 results1 <- matrix(ncol=7, nrow=1000)
 ## Com o criterio do maior deltaAIC: IT tem mais poder
 for(i in 1:1000)
@@ -22,7 +22,7 @@ for(i in 1:1000)
 ## Proporcoes de conclusoes corretas para NHT e IT, respectivamente:
 apply(results1[,6:7], 2, sum)/1000
 
-## Com o criterio do maior deltaAIC: NHT tem mais poder
+## Com o criterio deltaAIC>2: NHT tem mais poder
 set.seed(42) ## para fazer os mesmos sorteio nos dois casos
 results2 <-  matrix(ncol=7, nrow=1000)
 for(i in 1:1000)
@@ -33,8 +33,8 @@ apply(results2[,6:7], 2, sum)/1000
 ################################################################################
 ## Parte 2: conferindo se o calculo de deltaAIC das funcoes do PI
 ## batem com os calculos de deltaAIC pela expressao do Anderson,
-## eu foi a usada pelo Leo nas versoes anteriores.
-## A conslusao eh que as duas batem, como esperado.
+## que foi a usada pelo Leo nas versoes anteriores.
+## A conclusao eh que as duas batem, como esperado.
 ################################################################################
 ## Uma possibilidade:
 ## a funcao acima calcula o AICcs diretamente com a funcao interna do
@@ -189,3 +189,91 @@ for(i in 1:nrep){
 apply(results4, 2, sum)/nrow(results4)
 ## Comparando com as simulacoes da Parte 3:
 apply(results3, 2, sum)/nrow(results3)
+
+################################################################################
+## Parte 5 : compara com codigo original do Leo,
+## Arquivo Scripts.docx, enviado 20/06/2017
+################################################################################
+## Abaixo copiei o codigo para o teste t, tal como esta no arquivo do Leo
+## Para o codigo fucnionar tenho que atribuir x1 e x2 as variaveis do arquivo Crystal Ball
+## E definir um tamanho amostral
+x1 <- CB$x1
+x2 <- CB$x2
+N <- 10
+################################################################################
+## Esta parte sao os codigos originais do Leo
+## Teste-t (NHT)
+R=10000
+p=numeric(R)
+for(i in 1:R){
+    amostra1=sample(x1,size=N, replace=T)
+    amostra2=sample(x2,size=N,replace=T)
+    p[i]=t.test(amostra1,amostra2,var.equal=TRUE)$p.value
+}
+## Teste-t(IT)
+R=10000
+media=numeric(R)
+RSSn=numeric(R)
+RSSa=numeric(R)
+aiccn=numeric(R)
+aicca=numeric(R)
+Delta_aicc=numeric(R)
+for(i in 1:R){
+    amostra1=sample(x1,size=N,replace=T)
+    amostra2=sample(x2,size=N,replace=T)
+    media[i]=((mean(amostra1)+mean(amostra2))/2)
+    RSSn[i]=sum((amostra1-media[i])^2)+sum((amostra2-media[i])^2)
+    RSSa[i]=sum((amostra1-(mean(amostra1)))^2)+sum((amostra2-(mean(amostra2)))^2)
+    aiccn[i]=N*log(RSSn[i]/N)+4+(12/(N-3))
+    aicca[i]=N*log(RSSa[i]/N)+6+(24/(N-4))
+    Delta_aicc[i]=aiccn[i]-aicca[i]
+}
+## Aqui terminam os codigos originais do Leo, a seguir processo os resultados
+################################################################################
+## Proporcao de acerto de cada criterio
+leo.nht.right <- sum(p<0.05)
+leo.menorAIC.right <- sum(aiccn>aicca)
+leo.AIC2.right <- sum(Delta_aicc > 2)
+## Comparando com os resultados do codigo do PI: nao bate
+apply(results3, 2, sum)/nrow(results3)
+c("NHT IT"=leo.nht.right, "menor AIC"= leo.menorAIC.right, "IT dAIC>2" =leo.AIC2.right)/R
+
+### Acho que descobri: A expressão de AICc usa o totald e observacoes (soma dos tamanhos das amostras)
+## Mas o obejto N no codigo do Leo entra no sorteio das amostras como tamanho de cada amostra
+## e depois este mesmo objeto N entra no calculo do AIC como total de observacoes
+## A solucao é ou sortear N/2 observacoes naa amostragem ou usar N*2 nos calculos do AIC
+## Verificando com a primeira oopcao
+N <- 20 ## agora é numero total de observacoes = soma dos tamanhos das duas amostras
+R=10000
+p=numeric(R)
+for(i in 1:R){
+    amostra1=sample(x1,size=N/2, replace=T) ## mudei aqui de N para N/2
+    amostra2=sample(x2,size=N/2,replace=T)## mudei aqui de N para N/2
+    p[i]=t.test(amostra1,amostra2,var.equal=TRUE)$p.value
+}
+## Teste-t(IT)
+R=10000
+media=numeric(R)
+RSSn=numeric(R)
+RSSa=numeric(R)
+aiccn=numeric(R)
+aicca=numeric(R)
+Delta_aicc=numeric(R)
+for(i in 1:R){
+    amostra1=sample(x1,size=N/2,replace=T) ## mudei aqui de N para N/2
+    amostra2=sample(x2,size=N/2,replace=T) ## mudei aqui de N para N/2
+    media[i]=((mean(amostra1)+mean(amostra2))/2)
+    RSSn[i]=sum((amostra1-media[i])^2)+sum((amostra2-media[i])^2)
+    RSSa[i]=sum((amostra1-(mean(amostra1)))^2)+sum((amostra2-(mean(amostra2)))^2)
+    aiccn[i]=N*log(RSSn[i]/N)+4+(12/(N-3))
+    aicca[i]=N*log(RSSa[i]/N)+6+(24/(N-4))
+    Delta_aicc[i]=aiccn[i]-aicca[i]
+}
+## Comparando mais uma vez
+## Proporcao de acerto de cada criterio
+leo.nht.right <- sum(p < 0.05)
+leo.menorAIC.right <- sum(aiccn > aicca)
+leo.AIC2.right <- sum(Delta_aicc > 2)
+## Comparando com os resultados codigo PI: agora bate!
+apply(results3, 2, sum)/nrow(results3)
+c("NHT IT"=leo.nht.right, "menor AIC"= leo.menorAIC.right, "IT dAIC>2" =leo.AIC2.right)/R
