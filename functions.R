@@ -60,10 +60,10 @@ library(mvtnorm)
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651.
 wp.ttest <- function(tval, sd1, N, mu2){
-    if(missing(mu2))
-        delta <- tval*sd1*sqrt(2/N)
     if(missing(tval))
         delta <-  mu2
+    else
+        delta <- tval*sd1*sqrt(2/N)
     x1 <- rnorm(N, sd = sd1)
     x2 <- rnorm(N, mean = delta, sd = sd1)
     pvalue <- t.test(x1, x2, var.equal = TRUE)$p.value
@@ -253,10 +253,10 @@ wp.cortest <- function(tval, sd1, N, rpears){
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651. 
 wp.anova <- function(std.diff, sd1, N, mu1){
-    if(missing(mu1))
-        delta <- std.diff*sd1*sqrt(3/N)
     if(missing(std.diff))
         delta <-  mu1
+    else
+        mu1 <- delta <- std.diff*sd1*sqrt(3/N)
     x1 <- rnorm(N, sd=sd1)
     x2 <- rnorm(N, sd=sd1)
     x3 <- rnorm(N, mean = delta, sd=sd1)
@@ -374,8 +374,9 @@ wp.anova <- function(std.diff, sd1, N, mu1){
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651. 
-wp.lm <- function(std.beta, sd1, N, beta, rpears){
-    if(missing(beta)) beta <- std.beta*sd1/sqrt(N)
+wp.lm <- function(std.beta, sd1, N, beta, rpears=0){
+    if(missing(beta))
+        beta <- std.beta*sd1/sqrt(N)
     sigma <- matrix(c(1, rpears, rpears, 1), nrow=2)
     x <- rmvnorm(n = N, sigma=sigma)
     y <- rnorm(length(x[,1]), mean = beta*x[,1], sd = sd1)
@@ -407,7 +408,7 @@ wp.lm <- function(std.beta, sd1, N, beta, rpears){
         aic.right.1 <- dAICs[2]==0 & all(dAICs[-2]>2)
         aic.right.2 <- dAICs[2]==0
         }
-    results <- c(pF, wi[1], dAICs[1], M.error, S.error, nht.right, aic.right, aic.right.2)
+    results <- c(pF, wi[1], dAICs[1], M.error, S.error, nht.right, aic.right.1, aic.right.2)
     names(results) <- c("p.value.F", "Akaike.weight.H0", "deltaAIC.H0",
                         "M.error", "S.error", "NHT.right", "AIC.right", "AIC.right.delta")
     return(results)
@@ -418,23 +419,27 @@ wp.lm <- function(std.beta, sd1, N, beta, rpears){
 ## a given combination of parameters standard effect, standard deviations
 ## and sample sizes and the simulation function to run
 sim.averages <- function(effect, st.dev, sample.size, nrep,
-                         function.name){
+                         function.name, ...){
+    dots <- list(...)
     f1 <- get(function.name)
-    raw <- replicate(nrep, mapply(f1, effect, st.dev, sample.size),
+    raw <- replicate(nrep, mapply(f1, effect, st.dev, sample.size, MoreArgs = dots),
                      simplify=TRUE)
     results <- c(sum(raw[6,])/nrep, # Prop rightful conclusions NHT
                  sum(raw[7,])/nrep, # Prop rightfull conclusions IT by the criteria of lowest AIC
                  sum(raw[8,])/nrep, # Prop rightfull conclusions IT by the criteria deltaAIC > 2
-                 sum(raw[6,]!=raw[7,])/nrep,# Prop mismatches in conclusions IT x NHT
+                 sum(raw[6,]!=raw[7,])/nrep,# Prop mismatches in conclusions NHT x IT by the criteria of lowest AIC
+                 sum(raw[6,]!=raw[8,])/nrep,# Prop mismatches in conclusions NHT x IT deltaAIC>2
                  mean(raw[4,raw[6,]==1], na.rm=TRUE), # Mean M-error NHT
-                 mean(raw[4,raw[7,]==1], na.rm=TRUE), # Mean M-error IT
+                 mean(raw[4,raw[7,]==1], na.rm=TRUE), # Mean M-error IT by the criteria of lowest AIC
+                 mean(raw[4,raw[8,]==1], na.rm=TRUE), # Mean M-error IT by the criteria deltaAIC>2
                  mean(raw[5,raw[6,]==1], na.rm=TRUE), # Mean S-error NHT
-                 mean(raw[5,raw[7,]==1], na.rm=TRUE), # Mean S-error IT
+                 mean(raw[5,raw[7,]==1], na.rm=TRUE), # Mean S-error IT by the criteria of lowest AIC
+                 mean(raw[5,raw[8,]==1], na.rm=TRUE), # Mean S-error IT by the criteria deltaAIC>2
                  mean(raw[1,], na.rm=TRUE), # Mean p-value
                  mean(raw[2,], na.rm=TRUE) # Mean evidence weight for H0
                  ) 
-    names(results) <- c("p.NHT.right", "p.AIC.right", "p.AIC.right.2", "p.mismatch", "mean.NHT.M",
-                        "mean.AIC.M", "p.NHT.S",  "p.AIC.S", "mean.pvalue", "mean.wH0")
+    names(results) <- c("p.NHT.right", "p.AIC.right", "p.AIC.right.2", "p.mismatch", "p.mismatch.2", "mean.NHT.M",
+                        "mean.AIC.M", "mean.AIC.M.2", "p.NHT.S",  "p.AIC.S", "p.AIC.S.2", "mean.pvalue", "mean.wH0")
     return(results)
 }
 
