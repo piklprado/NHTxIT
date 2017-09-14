@@ -119,7 +119,8 @@ myLHS3 <- LHS(modelRun, factors, nsampH, q, q.arg, cl=cl)
 ## dataframe with parameter values and results
 anova.results <- cbind(get.data(myLHS3),  get.results(myLHS3))
 names(anova.results)[4:16] <- c("p.NHT.right", "p.AIC.right", "p.AIC.right.2", "p.mismatch", "p.mismatch.2", "mean.NHT.M",
-                              "mean.AIC.M", "mean.AIC.M.2", "p.NHT.S",  "p.AIC.S", "p.AIC.S.2", "mean.pvalue", "mean.wH0")
+                                "mean.AIC.M", "mean.AIC.M.2", "p.NHT.S",  "p.AIC.S", "p.AIC.S.2", "mean.pvalue", "mean.wH0")
+save.image()
 save(anova.results, file="anovaresults.RData")
 stopCluster(cl)
 
@@ -157,7 +158,7 @@ clusterExport(cl, c("nrepl", "AICc", "wp.lm", "sim.averages", "rmvnorm"))
 ## Run the simulations 
 myLHS4 <- LHS(modelRun, factors, nsampH, q, q.arg, cl=cl)
 ## dataframe with parameter values and results
-lm.results <- cbind(get.data(myLHS5),  get.results(myLHS5))
+lm.results <- cbind(get.data(myLHS4),  get.results(myLHS4))
 names(lm.results)[4:16] <- c("p.NHT.right", "p.AIC.right", "p.AIC.right.2", "p.mismatch", "p.mismatch.2", "mean.NHT.M",
                               "mean.AIC.M", "mean.AIC.M.2", "p.NHT.S",  "p.AIC.S", "p.AIC.S.2", "mean.pvalue", "mean.wH0")
 ## 2. With colinearity
@@ -174,5 +175,6 @@ lm.colin.results <- cbind(get.data(myLHS5),  get.results(myLHS5))
 names(lm.colin.results)[4:16] <- c("p.NHT.right", "p.AIC.right", "p.AIC.right.2", "p.mismatch", "p.mismatch.2", "mean.NHT.M",
                               "mean.AIC.M", "mean.AIC.M.2", "p.NHT.S",  "p.AIC.S", "p.AIC.S.2", "mean.pvalue", "mean.wH0")
 save(lm.results, lm.colin.results, file="lmresults.RData")
-stopCluster(cl)
 save.image()
+stopCluster(cl)
+

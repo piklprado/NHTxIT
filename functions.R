@@ -293,7 +293,7 @@ wp.anova <- function(std.diff, sd1, N, mu1){
         M.error <- coef(m3)[2]/mu1
         S.error <- M.error < 0
         aic.right.2 <- dAICs[4]==0 & all(dAICs[-4]>2)
-        aic.right.1 <- dAICs[4]==0
+        aic.right.1 <- dAICs[4] < 2
     }
     if(mu1 == 0){
         M.error <-  NA
@@ -388,9 +388,9 @@ wp.lm <- function(std.beta, sd1, N, beta, rpears=0){
     pF <- 1 - pf(F[1], F[2], F[3])
     p.vals <- summary(m12)$coefficients[2:3,4]
     AICs <- c(AICc(m0, nobs=N),
-        AICc(m1, nobs=N),
-        AICc(m2, nobs=N),
-        AICc(m12, nobs=N))
+              AICc(m1, nobs=N),
+              AICc(m2, nobs=N),
+              AICc(m12, nobs=N))
     dAICs <- AICs - min(AICs)
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
@@ -399,14 +399,14 @@ wp.lm <- function(std.beta, sd1, N, beta, rpears=0){
         S.error <- NA
         nht.right <- p.vals[1]>0.05 & p.vals[2]>0.05
         aic.right.2 <- dAICs[1]==0 & all(dAICs[-1]>2)
-        aic.right.1 <- dAICs[1]==0
+        aic.right.1 <- dAICs[1]<2
     }
     else{
-        M.error <-  coef(m12)[2]/beta
+        M.error <-  coef(m1)[2]/beta
         S.error <- M.error < 0
         nht.right <- p.vals[1]<0.05 & p.vals[2]>0.05
-        aic.right.1 <- dAICs[2]==0 & all(dAICs[-2]>2)
-        aic.right.2 <- dAICs[2]==0
+        aic.right.2 <- dAICs[2]==0 & all(dAICs[-2]>2)
+        aic.right.1 <- dAICs[2]<2
         }
     results <- c(pF, wi[1], dAICs[1], M.error, S.error, nht.right, aic.right.1, aic.right.2)
     names(results) <- c("p.value.F", "Akaike.weight.H0", "deltaAIC.H0",
@@ -425,16 +425,16 @@ sim.averages <- function(effect, st.dev, sample.size, nrep,
     raw <- replicate(nrep, mapply(f1, effect, st.dev, sample.size, MoreArgs = dots),
                      simplify=TRUE)
     results <- c(sum(raw[6,])/nrep, # Prop rightful conclusions NHT
-                 sum(raw[7,])/nrep, # Prop rightfull conclusions IT by the criteria of lowest AIC
-                 sum(raw[8,])/nrep, # Prop rightfull conclusions IT by the criteria deltaAIC > 2
-                 sum(raw[6,]!=raw[7,])/nrep,# Prop mismatches in conclusions NHT x IT by the criteria of lowest AIC
-                 sum(raw[6,]!=raw[8,])/nrep,# Prop mismatches in conclusions NHT x IT deltaAIC>2
+                 sum(raw[7,])/nrep, # Prop rightfull conclusions IT by the criterium 1:  deltaAIC <2 for the right model
+                 sum(raw[8,])/nrep, # Prop rightfull conclusions IT by the criterium 2: deltaAIC > 2 for all wrong models
+                 sum(raw[6,]!=raw[7,])/nrep,# Prop mismatches in conclusions NHT x IT criterium 1
+                 sum(raw[6,]!=raw[8,])/nrep,# Prop mismatches in conclusions NHT x IT crit 2
                  mean(raw[4,raw[6,]==1], na.rm=TRUE), # Mean M-error NHT
-                 mean(raw[4,raw[7,]==1], na.rm=TRUE), # Mean M-error IT by the criteria of lowest AIC
-                 mean(raw[4,raw[8,]==1], na.rm=TRUE), # Mean M-error IT by the criteria deltaAIC>2
+                 mean(raw[4,raw[7,]==1], na.rm=TRUE), # Mean M-error IT by the crit 1
+                 mean(raw[4,raw[8,]==1], na.rm=TRUE), # Mean M-error IT by the crit 2
                  mean(raw[5,raw[6,]==1], na.rm=TRUE), # Mean S-error NHT
-                 mean(raw[5,raw[7,]==1], na.rm=TRUE), # Mean S-error IT by the criteria of lowest AIC
-                 mean(raw[5,raw[8,]==1], na.rm=TRUE), # Mean S-error IT by the criteria deltaAIC>2
+                 mean(raw[5,raw[7,]==1], na.rm=TRUE), # Mean S-error IT by the crit 1
+                 mean(raw[5,raw[8,]==1], na.rm=TRUE), # Mean S-error IT by the crit 2
                  mean(raw[1,], na.rm=TRUE), # Mean p-value
                  mean(raw[2,], na.rm=TRUE) # Mean evidence weight for H0
                  ) 

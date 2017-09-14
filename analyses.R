@@ -20,7 +20,7 @@ plot(I(p.NHT.right/p.AIC.right) ~ D, data=t.results, cex=0.25)
 ## Proportion of conclusion mismatches
 plot(p.mismatch ~ D, data=t.results, cex=0.25)
 plot(p.mismatch.2 ~ D, data=t.results, cex=0.25)
-## Odd ratio rightfull x mismatches
+## Odds ratio rightfull x mismatches
 plot(I(p.NHT.right/p.AIC.right) ~ I(p.mismatch/(1-p.mismatch)), data=t.results, cex=0.25)
 ## Type-M errors
 plot(I(mean.NHT.M/mean.AIC.M) ~ D, data=t.results, cex=0.25)
@@ -60,7 +60,7 @@ plot(p.NHT.right ~ D, data=cor.results,
      xlab="Standardized effect", ylab="P rightful conclusion",
      cex=0.25, ylim=range(c(p.NHT.right,p.AIC.right)))
 points(p.AIC.right ~ D, data=cor.results, col="blue", cex=0.25)
-points(p.AIC.right ~ D, data=cor.results.d2, col="red", cex=0.25)
+points(p.AIC.right.2 ~ D, data=cor.results, col="red", cex=0.25)
 legend("topleft", c("NHT", "IT", "IT, d>2"), col=c("black","blue", "red"), pch=1, bty="n")
 ## Investigando a regiao de maior de dicrepancia: 0 < t < 5
 f1 <- function(tval, N) tval / sqrt(N-2+tval^2)
@@ -77,6 +77,7 @@ curve(tanh(6/sqrt(x-3)), 5,500)
 plot(I(p.NHT.right/p.AIC.right) ~ D, data=cor.results, cex=0.25)
 ## Proportion of conclusion mismatches
 plot(p.mismatch ~ D, data=cor.results, cex=0.25)
+plot(p.mismatch.2 ~ D, data=cor.results, cex=0.25)
 plot(p.mismatch ~ rpears, data=cor.results, cex=0.25)
 plot(p.mismatch ~ I(atanh(rpears)*sqrt(N-3)), data=cor.results, cex=0.25) ## z-score
 plot(p.mismatch ~ D, data=cor.results.d2, cex=0.25)
@@ -102,3 +103,16 @@ avPlots(cor.m1)
 avPlots(cor.lm1)
 avPlots(cor.lm2)
 
+################################################################################
+## linear regression
+################################################################################
+load("lmresults.RData")
+## proportion of rightfull conclusions
+par(mfrow=c(1,2))
+plot(p.NHT.right ~ D, data=lm.results, cex=0.25)
+points(p.AIC.right ~ D, data=lm.results, cex=0.25, col="blue")
+points(p.AIC.right.2 ~ D, data=lm.results, cex=0.25, col="red")
+plot(p.NHT.right ~ D, data=lm.colin.results, cex=0.25)
+points(p.AIC.right ~ D, data=lm.colin.results, cex=0.25, col="blue")
+points(p.AIC.right.2 ~ D, data=lm.colin.results, cex=0.25, col="red")
+par(mfrow=c(1,1))
