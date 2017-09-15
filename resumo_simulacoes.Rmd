@@ -1,0 +1,185 @@
+---
+title: "Resumo das simulações usando o hipercubo"
+author: "Paulo Inácio Prado"
+date: "`r format(Sys.time(), '%d de %B de %Y')`"
+output: 
+        rmdformats::readthedown:
+        self_contained: true
+        thumbnails: true
+        lightbox: true
+        gallery: false
+        highlight: tango
+        toc_depth: 4
+---
+
+```{r setup, echo=FALSE, warning=FALSE, message=F}
+library(knitr); 
+library(ggplot2)
+library(dplyr); library(tidyr);
+
+opts_chunk$set(fig.align = 'center', fig.show = 'hold', fig.height = 5, fig.width = 5,
+               warning = FALSE, message = FALSE, error = FALSE, echo=FALSE)
+options(formatR.arrow = TRUE,width = 90, cache=TRUE)
+source("functions.R")
+load("tresults.RData")
+load("corresults.RData")
+load("anovaresults.RData")
+load("lmresults.RData")
+```
+
+# Resumo das simulações
+
+## Situações simuladas
+  * teste t, 
+  * correlação simples
+  * anova de um fator de 3 níveis. Apenas grupo tem diferença com os outros dois, 
+  * regressão linear com duas  preditoras, sendo que apenas uma afeta a resposta:
+    * preditoras não correlacionadas
+    * preditoras têm correlação de 0,5 (colinearidade)
+
+## Parâmetros da simulação
+
+##### Tamanho do efeito. 
+É uma função do tamanho da amostra, do valor da estatística (diferença entre médias, coeficientes ou correlações), e o desvio-padrão da variável resposta. Em todos os casos o efeito cresce se a amostra é grande, se a diferença é grande e se o desvio-padrão das diferenças é pequeno. Em todos os casos o tamanho do efeito pdoe ser interpretado como uam generalização da estatística t. As expressões para tamanho do efeito para situação são:
+   * teste t: o próprio valor de t para amostras de mesmo tamanho e mesma variância: (x1 - x2) / (sd * sqrt(2/n))
+   * correlação: coeficiente de correlação convertido para estatística t: r * sqrt((n-2) / (1-r^2) )
+   * anova: diferença do grupos em relação aos outros, expresso na escala de t: (x1 - x2) / (sd * sqrt(3/n))
+   * coeficiente angular a regressão: conversão para a escala de t: beta / (sd / sqrt(n))
+##### Tamanho da amostra
+##### Desvio-padrão da resposta
+
+### Amostragem dos parâmetros
+
+Duas mil combinações dos parâmetros foram sorteadas com o método do hipercubo latino.
+No sorteio todos os valores tinham a mesma probabilidade (distribuição uniforme), dentro
+dos seguintes intervalos:
+
+* Tamanho do efeito: 0,1 a 8,0
+* Tamanho amostral: 10 a 100
+* Desvio-padrão da resposta: 0,1 a 5
+
+Os demais valores estão descritos no manuscrito, e foram mantidos constantes.
+
+## Output das simulações
+
+Para cada combinação de parâmetros foram realizadas dez mil simulações.
+Os resultados estão nos arquivos RData relacionados no final desse arquivo.
+Em cada um desses arquivos há dataframes com oito valores calculados para
+cada bateria com uma combinação de parâmetros:
+
+* *p.NHT.right* : Proporção de conclusões corretas por NHT
+* *p.AIC.right* :Proporção de conclusões corretas por IT, critério 1 (ver a seguir)
+* *p.AIC.right.2* :Proporção de conclusões corretas por IT, critério 2 (ver a seguir)
+* *p.mismatch* : Proporção de discordâncias entre NHT e IT, critério 1
+* *p.mismatch.2* : Proporção de discordâncias entre NHT e IT, critério 2
+* *mean.NHT.M* : Média do erro tipo M (Gelman & Carlin 2014) para NHT
+* *mean.AIC.M* : Média do erro tipo M para IT 1
+* *mean.AIC.M.2* : Média do erro tipo M para IT 2
+* *p.NHT.S* : proporção de erro tipo S (Gelman & Carlin 2014) para NHT
+* *p.AIC.S* : proporção de erro tipo S para IT 1
+* *p.AIC.S.2* : proporção de erro tipo S para IT 2
+* *mean.pvalue* : média do valor p para H0, por NHT
+* *mean.wH0* : média do peso de Akaike para H0, por IT
+
+### Critérios para associar IT a uma consluão correta
+
+Definimos que consideraríamos que IT chegou a uma conclusão correta
+se o modelo correpondente tivesse Delta-AIC < 2. Chamos isso de **critério 1**.
+Apenas para comparação registrei também os resultados para o critério
+de que uma conclusão é correta apenas se o modelo correspondente tivesse
+o menor AIC e todos os demais tivessem delta-AIC > 2. Chamei esse de **critério 2**. 
+
+
+# Resultados
+
+Abaixo vão os gráficos comparando NHT com os dois critérios
+
+
+## Probability of rightfull conclusions
+
+```{r prob rightful conclusions}
+p1b(t.results, main = "t-test")
+p1b(cor.results, main = "Correlation")
+p1b(anova.results, main = "Anova")
+p1b(lm.results, main = "Linear regression, no collinearity")
+p1b(lm.colin.results, main = "Linear regression, with collinearity")
+```
+
+
+## Probability of conclusion mismatch
+
+```{r prob mismatch}
+p2b(t.results, pos.leg = "topright", main = "t-test")
+p2b(cor.results,  pos.leg = "topright", main = "Correlation")
+p2b(anova.results,  pos.leg = "topright", main = "Anova")
+p2b(lm.results,  pos.leg = "topright", main = "Linear regression, no collinearity")
+p2b(lm.colin.results,  pos.leg = "topright", main = "Linear regression, with collinearity")
+``` 
+
+## Mean M-error
+
+```{r mean M-error}
+p3b(t.results,  pos.leg = "topright", main = "t-test")
+p3b(cor.results, pos.leg = "topright", main = "Correlation")
+p3b(anova.results, pos.leg = "topright", main = "Anova")
+p3b(lm.results, pos.leg = "topright", main = "Linear regression, no collinearity")
+p3b(lm.colin.results, pos.leg = "topright", main = "Linear regression, with collinearity")
+```
+
+## Proportion of S-error
+
+```{r prob s-error}
+p4b(t.results, pos.leg = "topright", main = "t-test")
+p4b(cor.results, pos.leg = "topright", main = "Correlation")
+p4b(anova.results, pos.leg = "topright", main = "Anova")
+p4b(lm.results, pos.leg = "topright", main = "Linear regression, no collinearity")
+p4b(lm.colin.results, pos.leg = "topright", main = "Linear regression, with collinearity")
+```
+
+
+## p-value x Akaike weight
+
+
+```{r p x w}
+plot(mean.pvalue ~ mean.wH0, data= t.results,
+         xlab = "Akaike weight for H0",
+     ylab = "p for H0", subset=mean.pvalue <0.1, cex=0.4,
+     xlim = c(0,
+              max(sapply(list(t.results, cor.results, anova.results, lm.results, lm.colin.results),
+                         function(x) max(x$mean.wH0[x$mean.pvalue <0.1]))))
+     )
+points(mean.pvalue ~ mean.wH0, data= cor.results,
+       subset=mean.pvalue <0.1, cex=0.4, col = "red")
+points(mean.pvalue ~ mean.wH0, data= anova.results,
+       subset=mean.pvalue <0.1, cex=0.4, col = "blue")
+points(mean.pvalue ~ mean.wH0, data= lm.results,
+       subset=mean.pvalue <0.1, cex=0.4, col = "orange")
+legend("topright", c("t-test", "Correlation", "ANOVA", "Linear regression"),
+       col = c("black", "red", "blue", "orange"), pch=19, bty="n")
+```
+
+
+# Próximos passos
+
+* Escolher as figuras que vão para o testo principal e material suplementar
+* Gerar as figuras definitivas
+* Rever resultados e discussão, em função desses novos resultados
+
+# Arquivos
+
+## Códigos em R
+
+* Comandos que rodaram a simulação (bem demorado, apenas para documentar): [simulations_rightful_conclusions.R](simulations_rightful_conclusions.R)
+* Funções para realizar as simulações e gráficos. A funções das simulações têm comentários em formato Roxygen que podem gerar uma página de ajuda. Lá há mais detalhes sobre as simulações: [functions.R](functions.R)
+* O arquivo base deste página, que tem os comandos usados para gerar os gráficos: [resumo_simulacoes.Rmd](resumo_simulacoes.Rmd)
+
+## Resultados das simulações
+
+Basta carregar os binários abaixo em sua área de trabalho e vc terá os dataframes com os resultados
+das simulações, como descritos na seção **Output das simulações**:
+
+* [tresults.RData](tresults.RData)
+* [corresults.RData](corresults.RData)
+* [anovaresults.RData](anovaresults.RData)
+* [lmresults.RData](lmresults.RData)
+

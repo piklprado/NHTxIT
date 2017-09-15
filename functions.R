@@ -376,7 +376,7 @@ wp.anova <- function(std.diff, sd1, N, mu1){
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651. 
 wp.lm <- function(std.beta, sd1, N, beta, rpears=0){
     if(missing(beta))
-        beta <- std.beta*sd1/sqrt(N)
+        beta <- std.beta*sd1/sqrt(N) 
     sigma <- matrix(c(1, rpears, rpears, 1), nrow=2)
     x <- rmvnorm(n = N, sigma=sigma)
     y <- rnorm(length(x[,1]), mean = beta*x[,1], sd = sd1)
@@ -443,4 +443,75 @@ sim.averages <- function(effect, st.dev, sample.size, nrep,
     return(results)
 }
 
- 
+## Plot functions ###
+
+## % of rightfull conclusions x effect size
+
+p1b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE, ...){
+    plot(p.NHT.right ~ D, data=data, cex=0.25,
+         ylim=range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)),
+         xlab="Effect size", ylab="P rightfull conclusions", ...)
+    if(AIC1) ## exibe resultados do primeiro criterio de AIC
+        points(p.AIC.right ~ D, data=data, cex=0.25, col="blue")
+    if(AIC2)
+    points(p.AIC.right.2 ~ D, data=data, cex=0.25, col="red")
+    if(legend)
+        legend(pos.leg,
+               c("NHT",
+                 expression(paste(Delta,"AIC < 2")),
+                 expression(paste(Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
+       pch=19, col=c("black", "blue", "red"), bty="n")
+}
+
+## Proportion of mismatching conclusions
+
+p2b <- function(data, legend = TRUE, pos.leg="bottomright", AIC2 = TRUE, ...){
+    plot(p.mismatch ~ D, data=data, cex=0.25,
+         ylim=range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)),
+         xlab="Effect size", ylab="P mismatching conclusions", col = "blue", ...)
+    if(AIC2)
+        points(p.mismatch.2 ~ D, data=data, cex=0.25, col="red")
+    if(legend)
+        legend(pos.leg,
+               c(
+                 expression(paste("NHT x ", Delta,"AIC < 2")),
+                 expression(paste("NHT x ",Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
+       pch=19, col=c("blue", "red"), bty="n")
+}
+
+## Mean M-error x effect size
+
+p3b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE, ...){
+    plot(mean.NHT.M ~ D, data=data, cex=0.25,
+         ylim=range(c(mean.NHT.M, mean.AIC.M, mean.AIC.M.2)),
+         xlab="Effect size", ylab="Mean M-error", ...)
+    if(AIC1)
+        points(mean.AIC.M ~ D, data=data, cex=0.25, col="blue")
+    if(AIC2)
+        points(mean.AIC.M.2 ~ D, data=data, cex=0.25, col="red")
+    if(legend)
+        legend(pos.leg,
+               c("NHT",
+                 expression(paste(Delta,"AIC < 2")),
+                 expression(paste(Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
+       pch=19, col=c("black", "blue", "red"), bty="n")
+}
+
+## P S-error x effect size
+
+p4b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE, ...){
+    plot(p.NHT.S ~ D, data=data, cex=0.25,
+         ylim=range(c(p.NHT.S, p.AIC.S, p.AIC.S.2)),
+         xlab="Effect size", ylab="Mean M-error", ...)
+    if(AIC1)
+        points(p.AIC.S ~ D, data=data, cex=0.25, col="blue")
+    if(AIC2)
+        points(p.AIC.S.2 ~ D, data=data, cex=0.25, col="red")
+    if(legend)
+        legend(pos.leg,
+               c("NHT",
+                 expression(paste(Delta,"AIC < 2")),
+                 expression(paste(Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
+       pch=19, col=c("black", "blue", "red"), bty="n")
+}
+

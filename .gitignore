@@ -1,6 +1,7 @@
 *.~
 *~
-*.RData
+.RData
 .RData
 .Rhistory
 *.pdf
+abacus/

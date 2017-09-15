@@ -2,13 +2,14 @@ library(ggplot2)
 ################################################################################
 ## t-test
 ################################################################################
-load("tresults.RData")
+load("abacus/tresults.RData")
 ## proportion of rightfull conclusions
 par(mfrow=c(1,2))
 plot(p.NHT.right ~ D, data=t.results, cex=0.25)
 plot(p.AIC.right ~ D, data=t.results, cex=0.25)
 par(mfrow=c(1,1))
-plot(p.NHT.right ~ D, data=t.results, cex=0.25, ylim=range(c(p.NHT.right,p.AIC.right)),
+plot(p.NHT.right ~ D, data=t.results, cex=0.25,
+     ylim=range(c(p.NHT.right,p.AIC.right)),
      xlab="Effect size", ylab="P rightfull conclusions")
 points(p.AIC.right ~ D, data=t.results, cex=0.25, col="blue")
 points(p.AIC.right.2 ~ D, data=t.results, cex=0.25, col="red")
@@ -24,6 +25,7 @@ plot(p.mismatch.2 ~ D, data=t.results, cex=0.25)
 plot(I(p.NHT.right/p.AIC.right) ~ I(p.mismatch/(1-p.mismatch)), data=t.results, cex=0.25)
 ## Type-M errors
 plot(I(mean.NHT.M/mean.AIC.M) ~ D, data=t.results, cex=0.25)
+points(I(mean.NHT.M/mean.AIC.M.2) ~ D, data=t.results, cex=0.25, col="red")
 abline(h=1, lty=2)
 plot(mean.NHT.M ~ D, data=t.results,
      ylim=range(c(mean.NHT.M,mean.AIC.M)), cex=0.25, xlim=c(0,5))
@@ -34,12 +36,13 @@ plot(mean.pvalue~mean.wH0, data=t.results, cex=0.25)
 ################################################################################
 ## correlation
 ################################################################################
-load("corresults.RData")
+load("abacus/corresults.RData")
 ## proportion of rightfull conclusions
-par(mfrow=c(1,2))
-plot(p.NHT.right ~ D, data=cor.results, cex=0.25)
-plot(p.AIC.right ~ D, data=cor.results, cex=0.25)
-par(mfrow=c(1,1))
+
+p1(cor.results)
+
+
+## Against correlation
 plot(p.NHT.right ~ D, data=cor.results, cex=0.25)
 points(p.AIC.right ~ D, data=cor.results, cex=0.25, col="blue")
 plot(p.NHT.right ~ rpears, data=cor.results, cex=0.25)
@@ -104,15 +107,22 @@ avPlots(cor.lm1)
 avPlots(cor.lm2)
 
 ################################################################################
+## anova
+################################################################################
+load("abacus/anovaresults.RData")
+## proportion of rightfull conclusions
+p1(anova.results)
+
+
+
+################################################################################
 ## linear regression
 ################################################################################
-load("lmresults.RData")
+load("abacus/lmresults.RData")
 ## proportion of rightfull conclusions
 par(mfrow=c(1,2))
-plot(p.NHT.right ~ D, data=lm.results, cex=0.25)
-points(p.AIC.right ~ D, data=lm.results, cex=0.25, col="blue")
-points(p.AIC.right.2 ~ D, data=lm.results, cex=0.25, col="red")
-plot(p.NHT.right ~ D, data=lm.colin.results, cex=0.25)
-points(p.AIC.right ~ D, data=lm.colin.results, cex=0.25, col="blue")
-points(p.AIC.right.2 ~ D, data=lm.colin.results, cex=0.25, col="red")
+p1(lm.results)
+p1(lm.colin.results)
 par(mfrow=c(1,1))
+
+
