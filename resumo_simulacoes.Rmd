@@ -41,11 +41,14 @@ load("lmresults.RData")
 
 ##### Tamanho do efeito. 
 É uma função do tamanho da amostra, do valor da estatística (diferença entre médias, coeficientes ou correlações), e o desvio-padrão da variável resposta. Em todos os casos o efeito cresce se a amostra é grande, se a diferença é grande e se o desvio-padrão das diferenças é pequeno. Em todos os casos o tamanho do efeito pdoe ser interpretado como uam generalização da estatística t. As expressões para tamanho do efeito para situação são:
-   * teste t: o próprio valor de t para amostras de mesmo tamanho e mesma variância: (x1 - x2) / (sd * sqrt(2/n))
+
+   * teste t: o próprio valor de t para amostras de mesmo tamanho e mesma variância: (x1 - x2) / (sd / sqrt(2/n))
    * correlação: coeficiente de correlação convertido para estatística t: r * sqrt((n-2) / (1-r^2) )
-   * anova: diferença do grupos em relação aos outros, expresso na escala de t: (x1 - x2) / (sd * sqrt(3/n))
+   * anova: diferença do grupos em relação aos outros, expresso na escala de t: (x1 - x2) / (sd / sqrt(3/n))
    * coeficiente angular a regressão: conversão para a escala de t: beta / (sd / sqrt(n))
+
 ##### Tamanho da amostra
+
 ##### Desvio-padrão da resposta
 
 ### Amostragem dos parâmetros
@@ -84,10 +87,10 @@ cada bateria com uma combinação de parâmetros:
 ### Critérios para associar IT a uma consluão correta
 
 Definimos que consideraríamos que IT chegou a uma conclusão correta
-se o modelo correpondente tivesse Delta-AIC < 2. Chamos isso de **critério 1**.
+se o modelo correpondente tivesse Delta-AIC = 0. Chamamos isso de **critério 1**.
 Apenas para comparação registrei também os resultados para o critério
 de que uma conclusão é correta apenas se o modelo correspondente tivesse
-o menor AIC e todos os demais tivessem delta-AIC > 2. Chamei esse de **critério 2**. 
+o menor AIC (dAIC = 0) e todos os demais tivessem delta-AIC > 2. Chamei esse de **critério 2**. 
 
 
 # Resultados
@@ -139,6 +142,7 @@ p4b(lm.colin.results, pos.leg = "topright", main = "Linear regression, with coll
 
 ## p-value x Akaike weight
 
+### Na região de interesse:
 
 ```{r p x w}
 plot(mean.pvalue ~ mean.wH0, data= t.results,
@@ -158,12 +162,34 @@ legend("topright", c("t-test", "Correlation", "ANOVA", "Linear regression"),
        col = c("black", "red", "blue", "orange"), pch=19, bty="n")
 ```
 
+### Ao longo de todo intervalo de p
+
+```{r p x w todo p}
+plot(mean.pvalue ~ mean.wH0, data= t.results,
+         xlab = "Akaike weight for H0",
+     ylab = "p for H0",  cex=0.4)
+points(mean.pvalue ~ mean.wH0, data= cor.results,
+        cex=0.4, col = "red")
+points(mean.pvalue ~ mean.wH0, data= anova.results,
+        cex=0.4, col = "blue")
+points(mean.pvalue ~ mean.wH0, data= lm.results,
+        cex=0.4, col = "orange")
+legend("topright", c("t-test", "Correlation", "ANOVA", "Linear regression"),
+       col = c("black", "red", "blue", "orange"), pch=19, bty="n")
+```
 
 # Próximos passos
 
 * Escolher as figuras que vão para o testo principal e material suplementar
 * Gerar as figuras definitivas
 * Rever resultados e discussão, em função desses novos resultados
+
+## Após a reunião de 03/10/2017
+
+* Mudar critério 1 de IT para dAIC do modelo correto = 0
+* Critério 2 premanece como critério 1 e dAIC  dos demais >2
+* Inset nos graficos de rightful conclusions com os casos de H0 verdadeira
+* 
 
 # Arquivos
 

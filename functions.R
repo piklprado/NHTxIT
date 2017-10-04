@@ -77,14 +77,14 @@ wp.ttest <- function(tval, sd1, N, mu2){
         M.error <- NA
         nht.right <- pvalue >= 0.05
         aic.right.2 <- dAICs[2] > 2
-        aic.right.1 <- dAICs[1] < dAICs[2] 
+        aic.right.1 <- dAICs[1] == 0
     }
     else{
         M.error <- coef(m2)[2]/delta
         S.error <- M.error < 0
         nht.right <- pvalue < 0.05
         aic.right.2 <- dAICs[1] > 2
-        aic.right.1 <- dAICs[1] > dAICs[2] 
+        aic.right.1 <- dAICs[2] == 0
     }
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
@@ -174,14 +174,14 @@ wp.cortest <- function(tval, sd1, N, rpears){
         S.error <-  NA
         nht.right <- p.value >= 0.05
         aic.right.2 <- dAICs[2] > 2
-        aic.right.1 <- dAICs[1] < dAICs[2] 
+        aic.right.1 <- dAICs[1] == 0
     }
     else{
         M.error <-  cor(x[,1],x[,2])/rpears
         S.error <- M.error < 0
         nht.right <- p.value < 0.05
         aic.right.2 <- dAICs[1] > 2
-        aic.right.1 <- dAICs[1] > dAICs[2]
+        aic.right.1 <- dAICs[2] == 0
         }
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
@@ -292,14 +292,14 @@ wp.anova <- function(std.diff, sd1, N, mu1){
     if(mu1 != 0){
         M.error <- coef(m3)[2]/mu1
         S.error <- M.error < 0
-        aic.right.2 <- dAICs[4]==0 & all(dAICs[-4]>2)
-        aic.right.1 <- dAICs[4] < 2
+        aic.right.2 <- dAICs[4]== 0 & all(dAICs[-4]>2)
+        aic.right.1 <- dAICs[4] == 0
     }
     if(mu1 == 0){
         M.error <-  NA
         S.error <- NA
         aic.right.2 <- dAICs[1]==0 & all(dAICs[-1]>2)
-        aic.right.1 <- dAICs[1] < 2
+        aic.right.1 <- dAICs[1] == 0
     }
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
@@ -399,14 +399,14 @@ wp.lm <- function(std.beta, sd1, N, beta, rpears=0){
         S.error <- NA
         nht.right <- p.vals[1]>0.05 & p.vals[2]>0.05
         aic.right.2 <- dAICs[1]==0 & all(dAICs[-1]>2)
-        aic.right.1 <- dAICs[1]<2
+        aic.right.1 <- dAICs[1] == 0
     }
     else{
         M.error <-  coef(m1)[2]/beta
         S.error <- M.error < 0
         nht.right <- p.vals[1]<0.05 & p.vals[2]>0.05
+        aic.right.1 <- dAICs[2]==0
         aic.right.2 <- dAICs[2]==0 & all(dAICs[-2]>2)
-        aic.right.1 <- dAICs[2]<2
         }
     results <- c(pF, wi[1], dAICs[1], M.error, S.error, nht.right, aic.right.1, aic.right.2)
     names(results) <- c("p.value.F", "Akaike.weight.H0", "deltaAIC.H0",
@@ -502,7 +502,7 @@ p3b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = 
 p4b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE, ...){
     plot(p.NHT.S ~ D, data=data, cex=0.25,
          ylim=range(c(p.NHT.S, p.AIC.S, p.AIC.S.2)),
-         xlab="Effect size", ylab="Mean M-error", ...)
+         xlab="Effect size", ylab="Mean S-error", ...)
     if(AIC1)
         points(p.AIC.S ~ D, data=data, cex=0.25, col="blue")
     if(AIC2)
