@@ -84,7 +84,7 @@ cada bateria com uma combinação de parâmetros:
 * *mean.pvalue* : média do valor p para H0, por NHT
 * *mean.wH0* : média do peso de Akaike para H0, por IT
 
-### Critérios para associar IT a uma consluão correta
+### Critérios para associar IT a uma conslusão correta
 
 Definimos que consideraríamos que IT chegou a uma conclusão correta
 se o modelo correpondente tivesse Delta-AIC = 0. Chamamos isso de **critério 1**.

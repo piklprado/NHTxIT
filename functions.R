@@ -443,6 +443,10 @@ sim.averages <- function(effect, st.dev, sample.size, nrep,
     return(results)
 }
 
+## Same as above, but when the null hypothesis is true
+sim.averages.null <- function(st.dev, sample.size, nrep, function.name, ...)
+    sim.averages(effect = 0, st.dev=st.dev, sample.size=sample.size, nrep=nrep, function.name=function.name, ...)
+                              
 ## Plot functions ###
 
 ## % of rightfull conclusions x effect size
