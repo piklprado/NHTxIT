@@ -36,9 +36,7 @@ library(mvtnorm)
 #'     S-errorr, Gelman & Carlin (2014), if the null hypothesis tests
 #'     reached to the right conclusion (yes=1, no=0), if the model
 #'     selection based on AICs reached to the right conclusion
-#'     (taking the null hypothesis as rejected only if it has a value of 
-#'     deltaAIC larger than two or if the null hypothesis
-#'     has a larger deltaAIC value than the alternative).
+#'     according to two criteria (see details, yes=1, no=0)
 #' @details This function simulates samples of the same size \code{N}
 #'     drawn from Gaussian distributions with the same standard
 #'     deviation \code{sd1}. The means of the two distributions differ
@@ -47,7 +45,11 @@ library(mvtnorm)
 #'     one group is zero.  The null hypothesis that the samples come
 #'     from the same distribution is then evaluated by a bicaudal
 #'     t-test and by model selection with AIC values corrected for small samples
-#'     (AICc). The two models compared are that the expected value of
+#'     (AICc). Two alternative criteria are used to evaluate if the
+#'     model selection reached a right conclusion: (1) if the correct
+#'     model has a delta-AIC value of zero or (2) if the alternative
+#'     model has a delta-AIC larger than two.
+#'     The two models compared in the model selection are that the expected value of
 #'     all values are the same or that the the expected values of each
 #'     sample are different. The evidence weight and delta-AIC of the
 #'     null hypothesis is then calculated from the AIC difference of
@@ -76,15 +78,15 @@ wp.ttest <- function(tval, sd1, N, mu2){
         S.error <- NA
         M.error <- NA
         nht.right <- pvalue >= 0.05
-        aic.right.2 <- dAICs[2] > 2
         aic.right.1 <- dAICs[1] == 0
+        aic.right.2 <- dAICs[1]==0 | all(dAICs < 2)
     }
     else{
         M.error <- coef(m2)[2]/delta
         S.error <- M.error < 0
         nht.right <- pvalue < 0.05
-        aic.right.2 <- dAICs[1] > 2
         aic.right.1 <- dAICs[2] == 0
+        aic.right.2 <- dAICs[2] == 0 |all(dAICs < 2)
     }
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
@@ -123,12 +125,9 @@ wp.ttest <- function(tval, sd1, N, mu2){
 #'     estimated correlation and the true value if
 #'     the difference when significant is in the opposite direction (S
 #'     and M type errors, Gelman & Carlin, 2014) if the null hypothesis tests
-#'     reached to the right conclusion (yes=1,
-#'     no=0), if the model
-#'     selection based on AICs reached to the right conclusion
-#'     (taking the null hypothesis as rejected only if it has a value of 
-#'     deltaAIC larger than two or if the null hypothesis
-#'     has a larger deltaAIC value than the alternative).
+#'     reached to the right conclusion (yes=1, no=0),
+#'     if the model selection based on AICs reached to the right
+#'     conclusion according to two criteria (see details, yes=1, no=0). 
 #' @details This function simulates samples of the same size \code{N}
 #'     drawn from a bivariate Gaussian distribution with the same
 #'     marginal standard
@@ -144,6 +143,10 @@ wp.ttest <- function(tval, sd1, N, mu2){
 #'     Gaussian to the data with a free parameter for correlation of
 #'     with correlation fixed to zero. The evidence weight is then
 #'     calculated from the AIC difference of the two models.
+#'     Two alternative criteria are used to evaluate if the 
+#'     model selection reached a right conclusion: (1) if the correct
+#'     model has a delta-AIC value of zero or (2) if the alternative
+#'     model has a delta-AIC larger than two.
 #'     Also, the M-error an S.error (Gelman & Carlin 2014)
 #'     are provided. The M-error is
 #'     calculated by dividing the estimated correlation among groups by
@@ -173,15 +176,15 @@ wp.cortest <- function(tval, sd1, N, rpears){
         M.error <-  NA
         S.error <-  NA
         nht.right <- p.value >= 0.05
-        aic.right.2 <- dAICs[2] > 2
         aic.right.1 <- dAICs[1] == 0
+        aic.right.2 <- dAICs[1] == 0 | all(dAICs < 2)
     }
     else{
         M.error <-  cor(x[,1],x[,2])/rpears
         S.error <- M.error < 0
         nht.right <- p.value < 0.05
-        aic.right.2 <- dAICs[1] > 2
         aic.right.1 <- dAICs[2] == 0
+        aic.right.2 <- dAICs[2] == 0 | all(dAICs < 2)
         }
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
@@ -224,11 +227,9 @@ wp.cortest <- function(tval, sd1, N, rpears){
 #'     the difference when significant is in the opposite direction (S
 #'     and M type errors, Gelman & Carlin, 2014), if the null hypothesis tests
 #'     (F-test + Tukey HSD) reached to the right conclusion (yes=1,
-#'     no=0), if the model
-#'     selection based on AICs reached to the right conclusion
-#'     (taking the null hypothesis as rejected only if it has a value of 
-#'     deltaAIC larger than two or if the null hypothesis
-#'     has a larger deltaAIC value than the alternative)
+#'     no=0),
+#'     if the model selection based on AICs reached to the right
+#'     conclusion according to two criteria (see details, yes=1, no=0).
 #' @details This function simulates samples of the same size \code{N}
 #'     drawn from Gaussian distributions with the same standard
 #'     deviation \code{sd1}. The mean of one of the distributions distributions differ
@@ -244,6 +245,18 @@ wp.cortest <- function(tval, sd1, N, rpears){
 #'     the other two. The evidence weight and delta-AIC
 #'     of the null hypothesis is then
 #'     calculated from the AIC difference between the models.
+#'     Two alternative criteria are used to evaluate if the 
+#'     model selection reached a right conclusion: (1) if the correct
+#'     model has a delta-AIC value of zero or (2) if all alternative
+#'     models have a delta-AIC larger than two OR if all
+#'     models with delta-AIC < 2 are nested and include the correct
+#'     model. For the situations simulated the
+#'     second condition of the last criterium implies that the correct
+#'     model has the fewer number of parameters within a set of nested
+#'     selected models. This is
+#'     an additional parsimony condition to solve the problem of
+#'     selected models with uninformative parameters
+#'     (Arnold 2010, Geweke & Meese 1981).
 #'     Also, the M-error an S-error (Gelman & Carlin 2014)
 #'     are provided. The M-error is
 #'     calculated by dividing the estimated difference among groups by
@@ -251,14 +264,17 @@ wp.cortest <- function(tval, sd1, N, rpears){
 #'     if the estimated difference among groups is of opposite sign of the true difference.
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
-#'     errors. Perspectives on Psychological Science, 9(6), 641-651. 
+#'     errors. Perspectives on Psychological Science, 9(6), 641-651.
+#' Geweke, J., & Meese, R. (1981). Estimating regression models of
+#'     finite but unknown order. International Economic Review,
+#'     55-70. 
 wp.anova <- function(std.diff, sd1, N, mu1){
     if(missing(std.diff))
         delta <-  mu1
     else
         mu1 <- delta <- std.diff*sd1*sqrt(3/N)
-    x1 <- rnorm(N, sd=sd1)
-    x2 <- rnorm(N, sd=sd1)
+    x1 <- rnorm(N, mean=0, sd=sd1)
+    x2 <- rnorm(N, mean=0, sd=sd1)
     x3 <- rnorm(N, mean = delta, sd=sd1)
     x <- c(x1,x2,x3)
     y <- factor(rep(c("am1","am2", "am3"), each=N))
@@ -290,17 +306,23 @@ wp.anova <- function(std.diff, sd1, N, mu1){
               AICc(m123, nobs=3*N))
     dAICs <- AICs - min(AICs)
     if(mu1 != 0){
+        IC <- confint(m123, level=0.85)
         M.error <- coef(m3)[2]/mu1
         S.error <- M.error < 0
-        aic.right.2 <- dAICs[4]== 0 & all(dAICs[-4]>2)
         aic.right.1 <- dAICs[4] == 0
-    }
+        ##aic.right.2 <- dAICs[4]<2 & ( all(dAICs[-4]>2) | (all(dAICs[1:2]>2) & dAICs[5]<2 & IC[2,1]<=0 & IC[2,2]>=0) )
+        aic.right.2 <- dAICs[4]<2 & all(dAICs[1:2]>2)
+     }
     if(mu1 == 0){
         M.error <-  NA
         S.error <- NA
-        aic.right.2 <- dAICs[1]==0 & all(dAICs[-1]>2)
         aic.right.1 <- dAICs[1] == 0
+        aic.right.2 <- (dAICs[1]==0 & all(dAICs[-1]>2)) |
+            all(dAICs[-c(2,3)]<2) | all(dAICs[-c(2,4)]<2) |
+            all(dAICs[-c(3,4)]<2) |all(dAICs[-c(2,3,5)]<2) | all(dAICs[-c(2,4,5)]<2) |
+            all(dAICs[-c(3,4,5)]<2) | all(dAICs[-c(2,3,4)]<2)
     }
+    #browser(expr=!aic.right.2)
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
     results <- c(pF, wi[1], dAICs[1], M.error, S.error, aov.right, aic.right.1, aic.right.2)
@@ -352,11 +374,9 @@ wp.anova <- function(std.diff, sd1, N, mu1){
 #'     the effect when significant is in the opposite direction (S
 #'     and M type errors, Gelman & Carlin, 2014), if the null hypothesis test
 #'     reached to the right conclusion (yes=1, 
-#'     no=0), if the model
-#'     selection based on AICs reached to the right conclusion
-#'     (taking the null hypothesis as rejected only if it has a value of 
-#'     deltaAIC larger than two or if the null hypothesis
-#'     has a larger deltaAIC value than the alternative).
+#'     no=0),
+#'     if the model selection based on AICs reached to the right
+#'     conclusion according to two criteria (see details, yes=1, no=0).
 #' @details This function samples two predictor variables from a
 #'     bivariate Gaussian with correlation term set by the user. The
 #'     marginal distributions of both predictors are standard
@@ -365,8 +385,20 @@ wp.anova <- function(std.diff, sd1, N, mu1){
 #'     has the mean value proportional to the first predictor. The
 #'     proportionality factor is the effect, or slope , of the
 #'     predictor and is set with argument \code{beta} or \{std.beta}. The standard
-#'     deviation of the response is set by the argument \code{sd1}. If
-#'     there is an effect of the predictor (beta!=0)
+#'     deviation of the response is set by the argument \code{sd1}.
+#'     Two alternative criteria are used to evaluate if the 
+#'     model selection reached a right conclusion: (1) if the correct
+#'     model has a delta-AIC value of zero or (2) if all alternative
+#'     models have a delta-AIC larger than two OR if all
+#'     models with delta-AIC < 2 are nested and include the correct
+#'     model. For the situations simulated the
+#'     second condition of the last criterium implies that the correct
+#'     model has the fewer number of parameters within a set of nested
+#'     selected models. This is
+#'     an additional parsimony condition to solve the problem of
+#'     selected models with uninformative parameters
+#'     (Arnold 2010, Geweke & Meese 1981).
+#'     If there is an effect of the predictor (beta!=0)
 #'     it is also calculated the ratio between the estimated and true
 #'     effect value (type-M error, Gelman & Carlin 2014) and
 #'     if the estimated and true effect are of the same sign (type-S error).
@@ -398,16 +430,21 @@ wp.lm <- function(std.beta, sd1, N, beta, rpears=0){
         M.error <- NA
         S.error <- NA
         nht.right <- p.vals[1]>0.05 & p.vals[2]>0.05
-        aic.right.2 <- dAICs[1]==0 & all(dAICs[-1]>2)
         aic.right.1 <- dAICs[1] == 0
+        aic.right.2 <- (dAICs[1]==0 & all(dAICs[-1]>2)) |
+            all(dAICs[-2]<2) | all(dAICs[-3]<2) |
+            all(dAICs[-c(3,4)]<2) | all(dAICs[-c(2,4)]<2) |
+            all(dAICs[-c(2,3)]<2)
     }
     else{
         M.error <-  coef(m1)[2]/beta
         S.error <- M.error < 0
         nht.right <- p.vals[1]<0.05 & p.vals[2]>0.05
         aic.right.1 <- dAICs[2]==0
-        aic.right.2 <- dAICs[2]==0 & all(dAICs[-2]>2)
-        }
+        #aic.right.2 <- dAICs[2]==0 & all(dAICs[-2]>2)
+        aic.right.2 <- dAICs[2]<2 & all(dAICs[c(1,3)]>2)
+    }
+    #browser(expr=!aic.right.2&nht.right)
     results <- c(pF, wi[1], dAICs[1], M.error, S.error, nht.right, aic.right.1, aic.right.2)
     names(results) <- c("p.value.F", "Akaike.weight.H0", "deltaAIC.H0",
                         "M.error", "S.error", "NHT.right", "AIC.right", "AIC.right.delta")
@@ -425,7 +462,7 @@ sim.averages <- function(effect, st.dev, sample.size, nrep,
     raw <- replicate(nrep, mapply(f1, effect, st.dev, sample.size, MoreArgs = dots),
                      simplify=TRUE)
     results <- c(sum(raw[6,])/nrep, # Prop rightful conclusions NHT
-                 sum(raw[7,])/nrep, # Prop rightfull conclusions IT by the criterium 1:  deltaAIC <2 for the right model
+                 sum(raw[7,])/nrep, # Prop rightfull conclusions IT by the criterium 1:  deltaAIC = 0 for the right model
                  sum(raw[8,])/nrep, # Prop rightfull conclusions IT by the criterium 2: deltaAIC > 2 for all wrong models
                  sum(raw[6,]!=raw[7,])/nrep,# Prop mismatches in conclusions NHT x IT criterium 1
                  sum(raw[6,]!=raw[8,])/nrep,# Prop mismatches in conclusions NHT x IT crit 2
@@ -451,20 +488,36 @@ sim.averages.null <- function(st.dev, sample.size, nrep, function.name, ...)
 
 ## % of rightfull conclusions x effect size
 
-p1b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE, ...){
-    plot(p.NHT.right ~ D, data=data, cex=0.25,
-         ylim=range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)),
-         xlab="Effect size", ylab="P rightfull conclusions", ...)
+p1b <- function(data, legend = TRUE, pos.leg="bottomright",
+                AIC1 = TRUE, AIC2 = TRUE, H0= FALSE,
+                colours=c("black","blue","red"),...){
+    if(H0){
+        Y <- data$SD/sqrt(data$N)
+        xlab="Standard error"
+    }
+    else{
+        Y <- data$D
+        xlab="Effect size"
+    }
+    if(!AIC2)
+        ylim <- with(data, range(c(p.NHT.right,p.AIC.right)))
+    else if(!AIC1)
+        ylim <- with(data, range(c(p.NHT.right,p.AIC.right.2)))
+    else
+        ylim <- with(data, range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)))
+    plot(p.NHT.right ~ Y, data=data, cex=0.25,
+         ylim= ylim,
+         xlab=xlab, ylab="P rightfull conclusions", col=colours[1], ...)
     if(AIC1) ## exibe resultados do primeiro criterio de AIC
-        points(p.AIC.right ~ D, data=data, cex=0.25, col="blue")
+        points(p.AIC.right ~ Y, data=data, cex=0.25, col=colours[2])
     if(AIC2)
-    points(p.AIC.right.2 ~ D, data=data, cex=0.25, col="red")
+        points(p.AIC.right.2 ~ Y, data=data, cex=0.25, col=colours[3])
     if(legend)
         legend(pos.leg,
                c("NHT",
-                 expression(paste(Delta,"AIC < 2")),
+                 expression(paste(Delta,"AIC = 0")),
                  expression(paste(Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
-       pch=19, col=c("black", "blue", "red"), bty="n")
+       pch=19, col=colours, bty="n")
 }
 
 ## Proportion of mismatching conclusions
@@ -478,7 +531,7 @@ p2b <- function(data, legend = TRUE, pos.leg="bottomright", AIC2 = TRUE, ...){
     if(legend)
         legend(pos.leg,
                c(
-                 expression(paste("NHT x ", Delta,"AIC < 2")),
+                 expression(paste("NHT x ", Delta,"AIC = 0")),
                  expression(paste("NHT x ",Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
        pch=19, col=c("blue", "red"), bty="n")
 }
@@ -496,7 +549,7 @@ p3b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = 
     if(legend)
         legend(pos.leg,
                c("NHT",
-                 expression(paste(Delta,"AIC < 2")),
+                 expression(paste(Delta,"AIC = 0")),
                  expression(paste(Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
        pch=19, col=c("black", "blue", "red"), bty="n")
 }
@@ -514,7 +567,7 @@ p4b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = 
     if(legend)
         legend(pos.leg,
                c("NHT",
-                 expression(paste(Delta,"AIC < 2")),
+                 expression(paste(Delta,"AIC = 0")),
                  expression(paste(Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
        pch=19, col=c("black", "blue", "red"), bty="n")
 }

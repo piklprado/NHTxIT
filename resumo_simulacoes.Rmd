@@ -21,10 +21,10 @@ opts_chunk$set(fig.align = 'center', fig.show = 'hold', fig.height = 5, fig.widt
                warning = FALSE, message = FALSE, error = FALSE, echo=FALSE)
 options(formatR.arrow = TRUE,width = 90, cache=TRUE)
 source("functions.R")
-load("tresults.RData")
-load("corresults.RData")
-load("anovaresults.RData")
-load("lmresults.RData")
+load("abacus/tresults.RData")
+load("abacus/corresults.RData")
+load("abacus/anovaresults.RData")
+load("abacus/lmresults.RData")
 ```
 
 # Resumo das simulações
@@ -48,9 +48,17 @@ load("lmresults.RData")
    * coeficiente angular a regressão: conversão para a escala de t: beta / (sd / sqrt(n))
 
 ##### Tamanho da amostra
-
+ * teste t e anova: n de observações em cada tratamento
+ * correlação e regressões: n de observações
+ 
 ##### Desvio-padrão da resposta
+Em todos os casos todas as populações amostradas tinha um mesmo desvio-padrão (homocedasticidade).
 
+ * teste t: desvio-padrão das distribuições gaussianas dos valores nas duas populações amostradas
+ * anova: idem para as três populações amostradas
+ * correlação: desvio-padrão das distribuições marginais da gaussiana bivariada da qual são tomadas as amostras
+ * regressão linear: desvio-padrão do coeficiente angular
+ 
 ### Amostragem dos parâmetros
 
 Duas mil combinações dos parâmetros foram sorteadas com o método do hipercubo latino.
@@ -59,7 +67,7 @@ dos seguintes intervalos:
 
 * Tamanho do efeito: 0,1 a 8,0
 * Tamanho amostral: 10 a 100
-* Desvio-padrão da resposta: 0,1 a 5
+* Desvio-padrão da resposta: 0,1 a 8
 
 Os demais valores estão descritos no manuscrito, e foram mantidos constantes.
 
@@ -84,18 +92,68 @@ cada bateria com uma combinação de parâmetros:
 * *mean.pvalue* : média do valor p para H0, por NHT
 * *mean.wH0* : média do peso de Akaike para H0, por IT
 
-### Critérios para associar IT a uma conslusão correta
+### Critérios para associar IT a uma conclusão correta
 
-Definimos que consideraríamos que IT chegou a uma conclusão correta
+Tínhamos definido que o IT chegou a uma conclusão correta
 se o modelo correpondente tivesse Delta-AIC = 0. Chamamos isso de **critério 1**.
-Apenas para comparação registrei também os resultados para o critério
-de que uma conclusão é correta apenas se o modelo correspondente tivesse
-o menor AIC (dAIC = 0) e todos os demais tivessem delta-AIC > 2. Chamei esse de **critério 2**. 
+Na reunião de 03/10/17 chegamos à conclusão que um critério mais adequado seria 
+que uma conclusão é correta apenas se o modelo correspondente tivesse
+o menor AIC (dAIC = 0) e todos os demais tivessem delta-AIC > 2. 
+Chamei esse de **critério 2**. 
 
+Nas simulações em que havia mais de dois modelos concorrentes (anova e
+regressão) a proporção de conclusões corretas de IC chegava a uma
+assíntota de 86%. Isso acontece pq há uma probabilidade de no mínimo
+16% de que modelos com um parâmetro a mais mas não informativo
+(coeficiente próximo de zero mas suficiente para dar um melhor ajuste)
+sejam selecionados. Isso é apontado no artigo do Arnold [^1], que sugere
+então que se aplique um critério adicional de parcimônia neste caso. O
+critério seria de escolher entre os modelos empatados o com menor
+número de parâmetros. A partir do Arnold cheguei a artigos
+estatísticos que provam que a probabilidade de inclusão de uma
+parâmetro não informativo em modelos lineares Gaussianos é mesmo cerca
+de 16% [^2]. Então é um procedimento bem fundamentado, apesar de
+inicialmente eu considerar heterodoxo demais para colocarmos neste
+artigo. Graças à indicação inicial do Leo do artigo do Arnold é que me
+caiu a ficha.
 
-# Resultados
+Assim, incluí no critério dois a solução proposta por
+Arnold, simulando a situação em que o usuário chegaria à
+conclusão correta se escolhesse o modelo mais simples entre os
+empatados. Para teste t e correlação, em que há apenas dois modelos
+concorrentes, isso equivale a considerar válido todas as seleções com
+delta-AIC do modelo correto <2. Para anova e regressão
+ficou assim:
 
-Abaixo vão os gráficos comparando NHT com os dois critérios
+* Quando havia a presença do efeito (diferença de um
+  grupo na anova ou efeito de uma preditora na regressão), considerei
+  corretas as seleções em que apenas modelos com este efeito estavam
+  selecionados, mesmo que entre eles houvesse modelos com efeitos
+  adicionais também selecionados. No caso da ANOVA, isso acontece
+  quando o modelo de diferença entre todos os grupos empata com o
+  modelo de diferença apenas do grupo correto. No caso da regressão,
+  isso acontece quando o modelo com a preditora correta empata com o
+  modelo com o modelo com as duas preditoras. Note que nos dois casos
+  se apenas o modelo com parâmetros adicionais for selecionado a
+  conclusão foi considerada incorreta.
+* Nos casos de ausência de efeito (H0 correta), considerei corretas
+  também as seleções em que os modelos empatados formavam uma
+  hieeraquia (nested), incluindo o nulo. Nestes casos o usuário também
+  chega ao modelo nulo se optar pelo modelo mais simples, o que pode
+  acontecer de várias maneiras:
+   * y~1 e y~x1
+   * y~1 e y~x1 e y ~ x1+x2
+   * y~1 e y~x2
+   * y~1 e y~x2 e y~x1+x2
+   
+  
+
+# Resultados para quando há efeito (H0 falsa)
+
+Abaixo vão os gráficos comparando NHT com os dois critérios,
+para os casos em que a há efeitos (H0 falsa). Este gráficos portanto
+mostram o poder de cada procedimento. Em seguida uma tabela
+com as probabilidades de conclusão correta nos casos em que H0 é verdadeira.
 
 
 ## Probability of rightfull conclusions
@@ -139,8 +197,29 @@ p4b(lm.results, pos.leg = "topright", main = "Linear regression, no collinearity
 p4b(lm.colin.results, pos.leg = "topright", main = "Linear regression, with collinearity")
 ```
 
+# Resultados para H0 verdadeira
 
-## p-value x Akaike weight
+Nas simulações para H0 verdadeira não há variação do efeito, então fiz
+gráficos da probabilidade de conclusões corretas em função do erro
+padrão (desvio-padrão / raiz quadrada do tamanho da amostra).
+Ainda assim, acho que estes gráficos podem ir para o material
+suplementar, porque não há muita variação importante. 
+
+
+```{r type-I error}
+p1b(t.results0, H0=TRUE)
+p1b(t.results0, legend=FALSE, AIC2=FALSE, H0=TRUE, main="t-test", colours=c("black", "red"))
+legend("bottomright",
+               c("NHT",
+                 expression(paste(Delta,"AIC = 0"))),
+       pch=19, col=c("black", "red"), bty="n")
+p1b(cor.results0, legend=FALSE, AIC2=FALSE, H0=TRUE, main="Correlation", colours=c("black", "red"))
+p1b(anova.results0, legend=FALSE, AIC1=FALSE, H0=TRUE, main="Anova")
+p1b(lm.results0, legend=FALSE, AIC1=FALSE, H0=TRUE, main="Linear regression, no collinearity")
+p1b(lm.colin.results0, legend=FALSE, AIC1=FALSE, H0=TRUE, main="Linear regression, collinearity")
+```
+
+# p-value x Akaike weight
 
 ### Na região de interesse:
 
@@ -158,7 +237,7 @@ points(mean.pvalue ~ mean.wH0, data= anova.results,
        subset=mean.pvalue <0.1, cex=0.4, col = "blue")
 points(mean.pvalue ~ mean.wH0, data= lm.results,
        subset=mean.pvalue <0.1, cex=0.4, col = "orange")
-legend("topright", c("t-test", "Correlation", "ANOVA", "Linear regression"),
+legend("bottomright", c("t-test", "Correlation", "ANOVA", "Linear regression"),
        col = c("black", "red", "blue", "orange"), pch=19, bty="n")
 ```
 
@@ -180,22 +259,21 @@ legend("topright", c("t-test", "Correlation", "ANOVA", "Linear regression"),
 
 # Próximos passos
 
-* Escolher as figuras que vão para o testo principal e material suplementar
+* Escolher as figuras que vão para o texto principal e material suplementar
 * Gerar as figuras definitivas
 * Rever resultados e discussão, em função desses novos resultados
 
 ## Após a reunião de 03/10/2017
 
 * Mudar critério 1 de IT para dAIC do modelo correto = 0
-* Critério 2 premanece como critério 1 e dAIC  dos demais >2
+* Critério 2 permanece como critério 1 e dAIC  dos demais >2
 * Inset nos graficos de rightful conclusions com os casos de H0 verdadeira
-* 
 
 # Arquivos
 
 ## Códigos em R
 
-* Comandos que rodaram a simulação (bem demorado, apenas para documentar): [simulations_rightful_conclusions.R](simulations_rightful_conclusions.R)
+* Comandos que rodaram a simulação no cluster (bem demorado, apenas para documentar): [simulations_rightful_conclusions.R](simulations_rightful_conclusions.R)
 * Funções para realizar as simulações e gráficos. A funções das simulações têm comentários em formato Roxygen que podem gerar uma página de ajuda. Lá há mais detalhes sobre as simulações: [functions.R](functions.R)
 * O arquivo base deste página, que tem os comandos usados para gerar os gráficos: [resumo_simulacoes.Rmd](resumo_simulacoes.Rmd)
 
@@ -204,8 +282,11 @@ legend("topright", c("t-test", "Correlation", "ANOVA", "Linear regression"),
 Basta carregar os binários abaixo em sua área de trabalho e vc terá os dataframes com os resultados
 das simulações, como descritos na seção **Output das simulações**:
 
-* [tresults.RData](tresults.RData)
-* [corresults.RData](corresults.RData)
-* [anovaresults.RData](anovaresults.RData)
-* [lmresults.RData](lmresults.RData)
+* [tresults.RData](abacus/tresults.RData)
+* [corresults.RData](abacus/corresults.RData)
+* [anovaresults.RData](abacus/anovaresults.RData)
+* [lmresults.RData](abacus/lmresults.RData)
 
+[^1]: Arnold, T.W. Uninformative parameters and model selection using Akaike's Information Criterion. Journal of Wildlife Management, 2010, 74.6: 1175-1178.
+
+[^2]: Teräsvirta, T., & Mellin, I. (1986). Model selection criteria and model selection tests in regression models. Scandinavian Journal of Statistics, 159-171; Geweke, J., & Meese, R. (1981). Estimating regression models of finite but unknown order. International Economic Review, 55-70. Veja também Aho, K., Derryberry, D., & Peterson, T. (2014). Model selection for ecologists: the worldviews of AIC and BIC. Ecology, 95(3), 631-636, para uma interpretação de que isso é o preço que o AIC paga por minimizar perda de informação.
