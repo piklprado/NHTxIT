@@ -287,8 +287,9 @@ legend("topleft", c("t-test", "Correlation", "ANOVA", "Linear regression"),
 ## Códigos em R
 
 * Comandos que rodaram a simulação no cluster (bem demorado, apenas para documentar): [simulations_rightful_conclusions.R](simulations_rightful_conclusions.R)
-* Funções para realizar as simulações e gráficos. A funções das simulações têm comentários em formato Roxygen que podem gerar uma página de ajuda. Lá há mais detalhes sobre as simulações: [functions.R](functions.R)
+* Funções para realizar as simulações e gráficos deste documento. A funções das simulações têm comentários em formato Roxygen que podem gerar uma página de ajuda. Lá há mais detalhes sobre as simulações: [functions.R](functions.R)
 * O arquivo base deste página, que tem os comandos usados para gerar os gráficos: [resumo_simulacoes.Rmd](resumo_simulacoes.Rmd)
+* Códigos para as figuras definitivas para o artigo: [final_plots.R](final_plots.R). Já subi as figuras em pdf no Overleaf e incluí no documento. O código gera os mesmos pdfs que estão lá.
 
 ## Resultados das simulações
 
