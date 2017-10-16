@@ -490,33 +490,34 @@ sim.averages.null <- function(st.dev, sample.size, nrep, function.name, ...)
 
 p1b <- function(data, legend = TRUE, pos.leg="bottomright",
                 AIC1 = TRUE, AIC2 = TRUE, H0= FALSE,
-                colours=c("black","blue","red"),...){
+                colours=c("black","blue","red"),
+                ylab="P rightfull conclusions",
+                xlab="Effect size", ylim, ...){
+    dots <- list(...)
     if(H0){
         Y <- data$SD/sqrt(data$N)
-        xlab="Standard error"
+        if(xlab!="") xlab="Standard error"
     }
     else{
         Y <- data$D
-        xlab="Effect size"
+        if(xlab!="") xlab="Effect size"
     }
-    if(!AIC2)
+    if(!AIC2&missing(ylim))
         ylim <- with(data, range(c(p.NHT.right,p.AIC.right)))
-    else if(!AIC1)
+    else if(!AIC1&missing(ylim))
         ylim <- with(data, range(c(p.NHT.right,p.AIC.right.2)))
-    else
+    else if(missing(ylim))
         ylim <- with(data, range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)))
-    plot(p.NHT.right ~ Y, data=data, cex=0.25,
+    plot(p.NHT.right ~ Y, data=data,
          ylim= ylim,
-         xlab=xlab, ylab="P rightfull conclusions", col=colours[1], ...)
+         xlab=xlab, ylab=ylab, col=colours[1], ...)
     if(AIC1) ## exibe resultados do primeiro criterio de AIC
-        points(p.AIC.right ~ Y, data=data, cex=0.25, col=colours[2])
+        points(p.AIC.right ~ Y, data=data, col=colours[2], ...)
     if(AIC2)
-        points(p.AIC.right.2 ~ Y, data=data, cex=0.25, col=colours[3])
+        points(p.AIC.right.2 ~ Y, data=data, col=colours[3], ...)
     if(legend)
         legend(pos.leg,
-               c("NHT",
-                 expression(paste(Delta,"AIC = 0")),
-                 expression(paste(Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
+               c("NHT", "IT crit. 1", "IT crit. 2"),
        pch=19, col=colours, bty="n")
 }
 
@@ -538,37 +539,51 @@ p2b <- function(data, legend = TRUE, pos.leg="bottomright", AIC2 = TRUE, ...){
 
 ## Mean M-error x effect size
 
-p3b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE, ...){
-    plot(mean.NHT.M ~ D, data=data, cex=0.25,
-         ylim=range(c(mean.NHT.M, mean.AIC.M, mean.AIC.M.2)),
-         xlab="Effect size", ylab="Mean M-error", ...)
-    if(AIC1)
-        points(mean.AIC.M ~ D, data=data, cex=0.25, col="blue")
+p3b <- function(data, legend = TRUE, pos.leg="bottomright",
+                AIC1 = TRUE, AIC2 = TRUE,
+                colours=c("black","blue","red"),
+                ylab="Mean M-error",
+                xlab="Effect size", ylim, ...){
+    if(!AIC2&missing(ylim))
+        ylim <- with(data, range(c(mean.NHT.M,mean.AIC.M)))
+    else if(!AIC1&missing(ylim))
+        ylim <- with(data, range(c(mean.NHT.M,mean.AIC.M.2)))
+    else if(missing(ylim))
+        ylim <- with(data, range(c(mean.NHT.M,mean.AIC.M, mean.AIC.M.2)))
+    plot(mean.NHT.M ~ D, data=data,
+         ylim=ylim,
+         xlab=xlab, ylab=ylab, col= colours[1], ...)
+    if(AIC1) 
+        points(mean.AIC.M ~ D, data=data, col=colours[2], ...)
     if(AIC2)
-        points(mean.AIC.M.2 ~ D, data=data, cex=0.25, col="red")
+        points(mean.AIC.M.2 ~ D, data=data, col=colours[3], ...)
     if(legend)
         legend(pos.leg,
-               c("NHT",
-                 expression(paste(Delta,"AIC = 0")),
-                 expression(paste(Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
-       pch=19, col=c("black", "blue", "red"), bty="n")
+               c("NHT", "IT crit. 1", "IT crit. 2"),
+       pch=19, col=colours, bty="n")
 }
 
 ## P S-error x effect size
 
-p4b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE, ...){
-    plot(p.NHT.S ~ D, data=data, cex=0.25,
-         ylim=range(c(p.NHT.S, p.AIC.S, p.AIC.S.2)),
-         xlab="Effect size", ylab="Mean S-error", ...)
+p4b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE,
+                ylab="Mean S-error",
+                xlab="Effect size", ylim, ...){
+    if(!AIC2&missing(ylim))
+        ylim <- with(data, range(c(p.NHT.S,p.AIC.S)))
+    else if(!AIC1&missing(ylim))
+        ylim <- with(data, range(c(p.NHT.S,p.AIC.S.2)))
+    else if(missing(ylim))
+        ylim <- with(data, range(c(p.NHT.S,p.AIC.S, p.AIC.S.2)))
+    plot(p.NHT.S ~ D, data=data,
+         ylim=ylim,
+         xlab=xlab, ylab=ylab, ...)
     if(AIC1)
-        points(p.AIC.S ~ D, data=data, cex=0.25, col="blue")
+        points(p.AIC.S ~ D, data=data, col="blue", ...)
     if(AIC2)
-        points(p.AIC.S.2 ~ D, data=data, cex=0.25, col="red")
+        points(p.AIC.S.2 ~ D, data=data, col="red", ...)
     if(legend)
         legend(pos.leg,
-               c("NHT",
-                 expression(paste(Delta,"AIC = 0")),
-                 expression(paste(Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
+               c("NHT", "IT crit. 1", "IT crit. 2"),
        pch=19, col=c("black", "blue", "red"), bty="n")
 }
 
