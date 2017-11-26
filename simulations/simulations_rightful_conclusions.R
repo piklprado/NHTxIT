@@ -68,7 +68,6 @@ names(t.results0)[3:15] <- c("p.NHT.right", "p.AIC.right", "p.AIC.right.2", "p.m
                               "mean.AIC.M", "mean.AIC.M.2", "p.NHT.S",  "p.AIC.S", "p.AIC.S.2", "mean.pvalue", "mean.wH0")
 save(t.results, t.results0, file="tresults.RData")
 stopCluster(cl)
-
 save.image()
 
 ################################################################################
@@ -244,7 +243,7 @@ names(lm.results)[4:16] <- c("p.NHT.right", "p.AIC.right", "p.AIC.right.2", "p.m
 ## Accessory function for a single run with a combination of parameters
 modelRun <- function (my.data) {
     return(mapply(sim.averages, my.data[,1], my.data[,2], my.data[,3],
-                  MoreArgs = list(nrep = nrepl, function.name="wp.lm", rpears=0.25)))
+                  MoreArgs = list(nrep = nrepl, function.name="wp.lm", rpears=0.5)))
 }
 ## Hypercube sample of nsamp combinations of parameters
 ## Run the simulations 

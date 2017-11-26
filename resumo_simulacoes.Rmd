@@ -22,10 +22,10 @@ opts_chunk$set(fig.align = 'center', fig.show = 'hold', fig.height = 5, fig.widt
                warning = FALSE, message = FALSE, error = FALSE, echo=FALSE)
 options(formatR.arrow = TRUE,width = 90, cache=TRUE)
 source("functions.R")
-load("abacus/tresults.RData")
-load("abacus/corresults.RData")
-load("abacus/anovaresults.RData")
-load("abacus/lmresults.RData")
+load("simulations/tresults.RData")
+load("simulations/corresults.RData")
+load("simulations/anovaresults.RData")
+load("simulations/lmresults.RData")
 ```
 
 # Resumo das simulações
@@ -296,10 +296,10 @@ legend("topleft", c("t-test", "Correlation", "ANOVA", "Linear regression"),
 Basta carregar os binários abaixo em sua área de trabalho e vc terá os dataframes com os resultados
 das simulações, como descritos na seção **Output das simulações**:
 
-* [tresults.RData](abacus/tresults.RData)
-* [corresults.RData](abacus/corresults.RData)
-* [anovaresults.RData](abacus/anovaresults.RData)
-* [lmresults.RData](abacus/lmresults.RData)
+* [tresults.RData](simulations/tresults.RData)
+* [corresults.RData](simulations/corresults.RData)
+* [anovaresults.RData](simulations/anovaresults.RData)
+* [lmresults.RData](simulations/lmresults.RData)
 
 [^1]: Arnold, T.W. Uninformative parameters and model selection using Akaike's Information Criterion. Journal of Wildlife Management, 2010, 74.6: 1175-1178.
 

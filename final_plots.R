@@ -1,5 +1,6 @@
-## Parameters from http://shinyapps.org/apps/RGraphCompendium/
+source("plot.functions.R")
 
+## Plot Parameters from http://shinyapps.org/apps/RGraphCompendium/
 par(cex.main = 1.5, mar = c(5, 6, 4, 4) + 0.1, mgp = c(3.5, 1, 0), 
     cex.lab = 1.5, font.lab = 2, cex.axis = 1.3, bty = "n", las = 1)
 greycol <- rgb(red = 190, green = 190, blue = 190, alpha = 95, maxColorValue = 255)
@@ -29,7 +30,6 @@ mtext("P rightfull conclusion", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
 
 ## M-errors
-
 pdf("../overleaf/figures/M-error.pdf", width=8, height=8)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
@@ -74,8 +74,8 @@ legend("bottomright", c("ANOVA", "Linear regression", "t-test", "Correlation"),
        pch=c(1,4,3,2), bty="n")
 dev.off()
 
-## Relationship between t-value and evidence weights ##
 
+## Relationship between t-value and evidence weights ##
 x <- seq(-4,5.8,by=0.01)
 y1 <- dt(x, df=20)
 y2 <- dt(x, df=20, ncp = 1)
