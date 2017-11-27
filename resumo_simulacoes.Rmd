@@ -277,10 +277,10 @@ legend("topleft", c("t-test", "Correlation", "ANOVA", "Linear regression"),
 
 # Próximos passos
 
-* Reescrever a metodologia para explicar o hipercubo e erros tipo M e S, e também o critério de parcimônia do Arnold.
-* Atualizar os resultados (rever os padrões, incluir descrição dos erros M e S)
-* Rever material suplementar
-* Rever discussão (não deve precisar mudar muita coisa)
+* Reescrever a metodologia para explicar o hipercubo e erros tipo M e S, e também o critério de parcimônia do Arnold. (FEITO)
+* Atualizar os resultados (rever os padrões, incluir descrição dos erros M e S) (A fazer)
+* Rever material suplementar (A FAZER)
+* Rever discussão (não deve precisar mudar muita coisa) (A FAZER)
 
 # Arquivos
 

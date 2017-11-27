@@ -277,7 +277,7 @@ The following objects are masked from ‘package:base’:
 > ## Accessory function for a single run with a combination of parameters
 > modelRun <- function (my.data) {
 +     return(mapply(sim.averages, my.data[,1], my.data[,2], my.data[,3],
-+                   MoreArgs = list(nrep = nrepl, function.name="wp.lm", rpears=0.25)))
++                   MoreArgs = list(nrep = nrepl, function.name="wp.lm", rpears=0.5)))
 + }
 > ## Hypercube sample of nsamp combinations of parameters
 > ## Run the simulations 
@@ -337,4 +337,4 @@ The following objects are masked from ‘package:base’:
 > 
 > proc.time()
      user    system   elapsed 
-  282.864     0.780 22306.169 
+  325.168     0.960 19339.990 

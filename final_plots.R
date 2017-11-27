@@ -1,6 +1,12 @@
+## Plot functions
 source("plot.functions.R")
+## Load simulation results
+load("simulations/tresults.RData")
+load("simulations/corresults.RData")
+load("simulations/anovaresults.RData")
+load("simulations/lmresults.RData")
 
-## Plot Parameters from http://shinyapps.org/apps/RGraphCompendium/
+## Plot Parameters (from http://shinyapps.org/apps/RGraphCompendium/)
 par(cex.main = 1.5, mar = c(5, 6, 4, 4) + 0.1, mgp = c(3.5, 1, 0), 
     cex.lab = 1.5, font.lab = 2, cex.axis = 1.3, bty = "n", las = 1)
 greycol <- rgb(red = 190, green = 190, blue = 190, alpha = 95, maxColorValue = 255)
