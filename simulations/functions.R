@@ -113,7 +113,7 @@ wp.ttest <- function(tval, sd1, N, mu2){
 #'     expressed as a t-value (t = r sqrt((n-2)/(1-r^2))).
 #' @param sd1 real positive, standard deviations of the marginal
 #'     Gaussian populations from which the samples are drawn.
-#' @param N integer positive, size of the two samples.
+#' @param N integer positive, size of the bivariate sample.
 #' @param rpears real number, the true Pearson correlation between the
 #'     two variables sampled. If missing calculated from \code{tval}.
 #'@return a vector with of size 8: the p-value of a correlation t-test
@@ -451,7 +451,7 @@ wp.lm <- function(std.beta, sd1, N, beta, rpears=0){
 
 ## A function to run replicates of any function above for
 ## a given combination of parameters standard effect, standard deviations
-## and sample sizes and the simulation function to run
+## and sample sizes. 
 sim.averages <- function(effect, st.dev, sample.size, nrep,
                          function.name, ...){
     dots <- list(...)
