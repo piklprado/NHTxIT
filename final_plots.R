@@ -14,6 +14,11 @@ greycol2 <- rgb(0, 0, 0, alpha = 0.7)
 grey1 <- grey.colors(10, alpha=0.3)[1]
 grey2 <- grey.colors(10, alpha=0.3)[10]
 
+## Predicted relationship for NHT Gaussian designs
+## (Gelman & Carlin Perspectives on Psychological Science 2014, Vol. 9(6) 641 –651)
+D.seq <- c(seq(0,1,.01),seq(1,10,.1),100)
+pGauss <- as.data.frame(t(sapply(D.seq, retrodesign, s=1, alpha =0.05)))
+
 
 ## Probabilities of rightfull conclusions when H0 is false
 pdf("../overleaf/figures/prightH1.pdf", width=8, height=8)
@@ -43,14 +48,14 @@ par(cex.main = 1.5, lwd=2,
     cex.lab = 1.25, font.lab = 2, cex.axis = 1.2, bty = "l", las = 1, mfrow=c(2,2),
     oma=c(3,3,0,0))
 p3b(t.results, main = "t-test", AIC1=FALSE, colours=c("black","grey","grey"),
-    legend=FALSE, xlab="", ylab="", cex=0.25, xlim=c(0,4))
+    legend=FALSE, xlab="", ylab="", cex=0.25, xlim=c(0.1,4.5), log="xy")
 legend("topright",c("NHT","IT"), pch=19, col=c("black","darkgrey"), bty="n", cex=1.2)
 p3b(cor.results, main = "Correlation", AIC1=FALSE, colours=c("black","grey","grey"),
-    legend=FALSE, xlab="", ylab="", cex=0.25, xlim=c(0,4))
+    legend=FALSE, xlab="", ylab="", cex=0.25,  xlim=c(0.1,4.5), log="xy")
 p3b(anova.results, main = "ANOVA", AIC1=FALSE, colours=c("black","grey","grey"),
-    legend=FALSE, xlab="", ylab="", cex=0.25, xlim=c(0,4))
+    legend=FALSE, xlab="", ylab="", cex=0.25,  xlim=c(0.1,4.5), log="xy")
 p3b(lm.results, main = "Linear regression", AIC1=FALSE, colours=c("black","grey","grey"),
-    legend=FALSE, xlab="", ylab="", cex=0.25, xlim=c(0,4))
+    legend=FALSE, xlab="", ylab="", cex=0.25,  xlim=c(0.1,4.5), log="xy")
 mtext("Effect Size", side=1, outer=TRUE, cex=2, line=0)
 mtext("Mean M-error", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
@@ -173,3 +178,28 @@ p4b(lm.colin.results, main = "Linear regression, collinearity",
 mtext("Effect Size", side=1, outer=TRUE, cex=2, line=0)
 mtext("Mean S-error", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
+
+##### Experiments
+## M-errors x power
+
+p6b(anova.results, main = "ANOVA", AIC1=FALSE, colours=c("black","grey","grey"),
+    legend=FALSE, xlab="", ylab="", cex=0.25, xlim=c(0,0.5), ylim=c(1e-4,1), log="xy")
+lines(typeS ~ power, data=pGauss, col="blue")
+
+p5b(anova.results, main = "ANOVA", AIC1=FALSE, colours=c("black","grey","grey"),
+    legend=FALSE, xlab="", ylab="", cex=0.25, xlim=c(0,0.5), log="xy")
+lines(exaggeration ~ power, data=pGauss, col="blue")
+
+
+
+p4b(anova.results, main = "ANOVA", AIC1=FALSE, colours=c("black","grey","grey"),
+    legend=FALSE, xlab="", ylab="", cex=0.25, log="xy", ylim=c(1e-4,0.6), xlim=c(1e-1,4))
+lines(typeS ~ D.seq, data=pGauss, col="blue")
+p3b(anova.results, main = "ANOVA", AIC1=FALSE, colours=c("black","grey","grey"),
+    legend=FALSE, xlab="", ylab="", cex=0.25, log="xy", xlim=c(1e-1,4.5))
+lines(exaggeration ~ D.seq, data=pGauss, col="blue")
+
+
+## M-error x S-error
+plot(p.NHT.S ~ mean.NHT.M, data = t.results, cex=0.25, ylim=c(0,.5))
+points(p.AIC.S.2 ~ mean.AIC.M.2, data = t.results, cex=0.25, col="blue")

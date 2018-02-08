@@ -20,10 +20,10 @@ library(mvtnorm)
 #' @param mu2 real number, the mean of one of the Gaussian populations
 #'     from which the samples are drawn.  The mean of the other
 #'     population is set to zero.
-#' @param delta2 logical; should null hypothesis be rejected only if it has a value of 
-#'     deltaAIC larger than two? If FALSE the null
-#'     hypothesis is rejected if it has a larger deltaAIC value than the
-#'     alternative, even if deltaAIC<2.
+#' @param delta2 logical; should null hypothesis be rejected only if
+#'     it has a value of deltaAIC larger than two? If FALSE the null
+#'     hypothesis is rejected if it has a larger deltaAIC value than
+#'     the alternative, even if deltaAIC<2.
 #' @return a vector of length 8: the p-value of a two-tailed t-test
 #'     for the null hypothesis that the two samples come from the same
 #'     distributions; the Akaike evidence weight of the null
@@ -31,33 +31,35 @@ library(mvtnorm)
 #'     comes from a distribution with a different mean; the difference
 #'     between Akaike Information Criteria of the null to the
 #'     alternative hypothesis; the ratio between the estimated
-#'     difference among groups and the true difference, if the
-#'     difference when significant is in the opposite direction (M and
-#'     S-errorr, Gelman & Carlin (2014), if the null hypothesis tests
-#'     reached to the right conclusion (yes=1, no=0), if the model
+#'     difference among groups and the true difference, and if the
+#'     estimated difference among groups has the incorrect sign (M and
+#'     S-errorr, Gelman & Carlin (2014); if the null hypothesis tests
+#'     reached to the right conclusion (yes=1, no=0); if the model
 #'     selection based on AICs reached to the right conclusion
 #'     according to two criteria (see details, yes=1, no=0)
-#' @details This function simulates samples of the same size \code{N}
+#'@details This function simulates samples of the same size \code{N}
 #'     drawn from Gaussian distributions with the same standard
 #'     deviation \code{sd1}. The means of the two distributions differ
 #'     according to the true mean of one group or to the t-value
 #'     indicated by the argument \code{t.val}, given that the mean of
 #'     one group is zero.  The null hypothesis that the samples come
 #'     from the same distribution is then evaluated by a bicaudal
-#'     t-test and by model selection with AIC values corrected for small samples
-#'     (AICc). Two alternative criteria are used to evaluate if the
-#'     model selection reached a right conclusion: (1) if the correct
-#'     model has a delta-AIC value of zero or (2) if the alternative
-#'     model has a delta-AIC larger than two.
-#'     The two models compared in the model selection are that the expected value of
-#'     all values are the same or that the the expected values of each
-#'     sample are different. The evidence weight and delta-AIC of the
-#'     null hypothesis is then calculated from the AIC difference of
-#'     the two models. Also, the M-error an S.error (Gelman & Carlin 2014)
-#'     are provided. The M-error is
-#'     calculated by dividing the estimated difference among groups by
-#'     the true difference. The S.error is a binary variable that has value 1 (TRUE)
-#'     if the estimated difference among groups is of opposite sign of the true difference.
+#'     t-test and by model selection with AIC values corrected for
+#'     small samples (AICc). Two alternative criteria are used to
+#'     evaluate if the model selection reached a right conclusion: (1)
+#'     if the correct model has a delta-AIC value of zero or (2) if
+#'     the alternative model has a delta-AIC larger than two.  The two
+#'     models compared in the model selection are that the expected
+#'     value of all values are the same or that the the expected
+#'     values of each sample are different. The evidence weight and
+#'     delta-AIC of the null hypothesis is then calculated from the
+#'     AIC difference of the two models. Also, the M-error an S.error
+#'     (Gelman & Carlin 2014) are provided. The M-error is calculated
+#'     the abolsute value of the ratio between the estimated
+#'     difference among groups by the true difference. The S.error is
+#'     a binary variable that has value 1 (TRUE) if the estimated
+#'     difference among groups is of opposite sign of the true
+#'     difference.
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651.
@@ -79,14 +81,14 @@ wp.ttest <- function(tval, sd1, N, mu2){
         M.error <- NA
         nht.right <- pvalue >= 0.05
         aic.right.1 <- dAICs[1] == 0
-        aic.right.2 <- dAICs[1]==0 | all(dAICs < 2)
+        aic.right.2 <- dAICs[1] == 0 | all(dAICs < 2)
     }
     else{
-        M.error <- coef(m2)[2]/delta
-        S.error <- M.error < 0
+        M.error <- abs(coef(m2)[2]/delta)
+        S.error <- (coef(m2)[2]/delta) < 0
         nht.right <- pvalue < 0.05
         aic.right.1 <- dAICs[2] == 0
-        aic.right.2 <- dAICs[2] == 0 |all(dAICs < 2)
+        aic.right.2 <- dAICs[2] == 0 | all(dAICs < 2)
     }
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
@@ -101,57 +103,55 @@ wp.ttest <- function(tval, sd1, N, mu2){
 
 #' NHT and IT comparison for correlation tests between two samples
 #'
-#' This function simulates samples from bivariate Gaussian distribution
-#' with equal marginal variances. The hypothesis that there is a
-#' correlation between the two variables is evaluated with a
-#' significance correlation test and also comparing 
-#' the AIC of the fit of the data to a bivariate Gaussian with the
-#' covariance parameter free or set to zero.
-#' @param tval real number, the true value of  correlation coefficient
-#' expressed as a t-value (t = r sqrt((n-2)/(1-r^2))).
-#' @param sd1 real positive, standard
-#'     deviations of the marginal Gaussian
-#'     populations from which the samples are drawn.
+#' This function simulates samples from bivariate Gaussian
+#' distribution with equal marginal variances. The hypothesis that
+#' there is a correlation between the two variables is evaluated with
+#' a significance correlation test and also comparing the AIC of the
+#' fit of the data to a bivariate Gaussian with the covariance
+#' parameter free or set to zero.
+#' @param tval real number, the true value of correlation coefficient
+#'     expressed as a t-value (t = r sqrt((n-2)/(1-r^2))).
+#' @param sd1 real positive, standard deviations of the marginal
+#'     Gaussian populations from which the samples are drawn.
 #' @param N integer positive, size of the two samples.
-#' @param rpears real number, the true Pearson correlation between the two
-#'     variables sampled. If missing calculated from \code{tval}.
-#' @return a vector with of size 8: the p-value of a correlation
-#'     t-test (\code{cor.test} for the
-#'     null hypothesis that the two samples come from independent
-#'     distributions (zero correlation); and the Akaike evidence weight of the null
-#'     hypothesis compared to the alternative model that the samples come from a bivariate Gaussian with some degree of 
-#'     correlation; the difference between Akaike Information Criteria of the null
-#'     to the alternative hypothesis; and the ratio between the
-#'     estimated correlation and the true value if
-#'     the difference when significant is in the opposite direction (S
-#'     and M type errors, Gelman & Carlin, 2014) if the null hypothesis tests
-#'     reached to the right conclusion (yes=1, no=0),
-#'     if the model selection based on AICs reached to the right
-#'     conclusion according to two criteria (see details, yes=1, no=0). 
-#' @details This function simulates samples of the same size \code{N}
+#' @param rpears real number, the true Pearson correlation between the
+#'     two variables sampled. If missing calculated from \code{tval}.
+#'@return a vector with of size 8: the p-value of a correlation t-test
+#'     (\code{cor.test} for the null hypothesis that the two samples
+#'     come from independent distributions (zero correlation); and the
+#'     Akaike evidence weight of the null hypothesis compared to the
+#'     alternative model that the samples come from a bivariate
+#'     Gaussian with some degree of correlation; the difference
+#'     between Akaike Information Criteria of the null to the
+#'     alternative hypothesis; and the ratio between the estimated
+#'     correlation and the true value and if the estimated correlation
+#'     has the incorrect sign (S and M type errors, Gelman & Carlin,
+#'     2014); if the null hypothesis tests reached to the right
+#'     conclusion (yes=1, no=0), if the model selection based on AICs
+#'     reached to the right conclusion according to two criteria (see
+#'     details, yes=1, no=0).
+#'@details This function simulates samples of the same size \code{N}
 #'     drawn from a bivariate Gaussian distribution with the same
-#'     marginal standard
-#'     deviation for both samples (calculated from \code{se1} and
-#'     \code{N}) and correlation given by \code{corr}. The mean of both
-#'     distributions are set to zero.
-#'     The null hypothesis that the samples come from
-#'     independent distributions (or from a bivariate normal with no
-#'     correlation, wich is the same) is then evaluated by a bicaudal
-#'     t-test (see \code{cor.test}}
-#'     and by model selection AIC corrected for small samples
-#'     (AICc). The two models compared are the fits of a bivariate
-#'     Gaussian to the data with a free parameter for correlation of
-#'     with correlation fixed to zero. The evidence weight is then
-#'     calculated from the AIC difference of the two models.
-#'     Two alternative criteria are used to evaluate if the 
+#'     marginal standard deviation for both samples (calculated from
+#'     \code{se1} and \code{N}) and correlation given by
+#'     \code{corr}. The mean of both distributions are set to zero.
+#'     The null hypothesis that the samples come from independent
+#'     distributions (or from a bivariate normal with no correlation,
+#'     wich is the same) is then evaluated by a bicaudal t-test (see
+#'     \code{cor.test}} and by model selection AIC corrected for small
+#'     samples (AICc). The two models compared are the fits of a
+#'     bivariate Gaussian to the data with a free parameter for
+#'     correlation of with correlation fixed to zero. The evidence
+#'     weight is then calculated from the AIC difference of the two
+#'     models.  Two alternative criteria are used to evaluate if the
 #'     model selection reached a right conclusion: (1) if the correct
 #'     model has a delta-AIC value of zero or (2) if the alternative
-#'     model has a delta-AIC larger than two.
-#'     Also, the M-error an S.error (Gelman & Carlin 2014)
-#'     are provided. The M-error is
-#'     calculated by dividing the estimated correlation among groups by
-#'     the true difference. The S.error is a binary variable that has value 1 (TRUE)
-#'     if the estimated correlation is of opposite sign of the true value.
+#'     model has a delta-AIC larger than two.  Also, the M-error an
+#'     S.error (Gelman & Carlin 2014) are provided. The M-error is
+#'     calculated as the absolute value of the ratio between the
+#'     estimated correlation among groups by the true difference. The
+#'     S.error is a binary variable that has value 1 (TRUE) if the
+#'     estimated correlation is of opposite sign of the true value.
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651. 
@@ -180,8 +180,8 @@ wp.cortest <- function(tval, sd1, N, rpears){
         aic.right.2 <- dAICs[1] == 0 | all(dAICs < 2)
     }
     else{
-        M.error <-  cor(x[,1],x[,2])/rpears
-        S.error <- M.error < 0
+        M.error <-  abs( cor(x[,1],x[,2])/rpears )
+        S.error <- ( cor(x[,1],x[,2])/rpears ) < 0
         nht.right <- p.value < 0.05
         aic.right.1 <- dAICs[2] == 0
         aic.right.2 <- dAICs[2] == 0 | all(dAICs < 2)
@@ -208,60 +208,59 @@ wp.cortest <- function(tval, sd1, N, rpears){
 #' predictors.
 #'
 #' @param std.diff real number, the true difference or effect size
-#'     expressed as a t-value (difference between true mean of treatment one and treatment 2 divided
-#'     by the standard error of the difference). Ignored if \code{mu1}
-#'     is provided
-#' @param mu1 real number, the mean of one of the Gaussian populations from which the samples are drawn.
-#' The mean of the other two populations is set to zero.
+#'     expressed as a t-value (difference between true mean of
+#'     treatment one and treatment 2 divided by the standard error of
+#'     the difference). Ignored if \code{mu1} is provided
+#' @param mu1 real number, the mean of one of the Gaussian populations
+#'     from which the samples are drawn.  The mean of the other two
+#'     populations is set to zero.
 #' @param sd1 real positive, the standard deviation of the Gaussian
 #'     populations from which the samples are drawn.
 #' @param N integer positive, size of the three samples.
-#' @return a vector of length 8: the p-value of a F-test for the
-#'     null hypothesis that the three samples come from the same
-#'     distribution; the Akaike evidence weight of the null
-#'     hypothesis compared to the alternative models that at least one
-#'     sample comes from a distribution with a different mean;
-#'     the difference between Akaike Information Criteria of the null
-#'     to the most plausible hypothesis; the ratio between the
-#'     estimated difference among group 1 and the other two and the true difference if
-#'     the difference when significant is in the opposite direction (S
-#'     and M type errors, Gelman & Carlin, 2014), if the null hypothesis tests
-#'     (F-test + Tukey HSD) reached to the right conclusion (yes=1,
-#'     no=0),
-#'     if the model selection based on AICs reached to the right
-#'     conclusion according to two criteria (see details, yes=1, no=0).
+#' @return a vector of length 8: the p-value of a F-test for the null
+#'     hypothesis that the three samples come from the same
+#'     distribution; the Akaike evidence weight of the null hypothesis
+#'     compared to the alternative models that at least one sample
+#'     comes from a distribution with a different mean; the difference
+#'     between Akaike Information Criteria of the null to the most
+#'     plausible hypothesis; the absolute ratio between the estimated
+#'     difference among group 1 and the other two and the true
+#'     difference and if the estimated difference among group 1 and
+#'     the others has the incorrect sign (S and M type errors, Gelman
+#'     & Carlin, 2014); if the null hypothesis tests (F-test + Tukey
+#'     HSD) reached to the right conclusion (yes=1, no=0); if the
+#'     model selection based on AICs reached to the right conclusion
+#'     according to two criteria (see details, yes=1, no=0).
 #' @details This function simulates samples of the same size \code{N}
 #'     drawn from Gaussian distributions with the same standard
-#'     deviation \code{sd1}. The mean of one of the distributions distributions differ
-#'     according to the standardized effect (or alternatively the true mean) of one group indicated by the argument 
-#'     \code{mu1}, given that the mean of the other two groups is zero.
-#'     The null hypothesis that the samples come from
+#'     deviation \code{sd1}. The mean of one of the distributions
+#'     distributions differ according to the standardized effect (or
+#'     alternatively the true mean) of one group indicated by the
+#'     argument \code{mu1}, given that the mean of the other two
+#'     groups is zero.  The null hypothesis that the samples come from
 #'     the same distribution is then evaluated by a F-test and a Tukey
-#'     HSD Tukey if necessary 
-#'     and by model selection AIC corrected for small samples
-#'     (AICc). The  models compared are that the expected value of
-#'     all values are the same, that the expected values
-#'     of each sample are different, or that one group is different of
-#'     the other two. The evidence weight and delta-AIC
-#'     of the null hypothesis is then
-#'     calculated from the AIC difference between the models.
-#'     Two alternative criteria are used to evaluate if the 
-#'     model selection reached a right conclusion: (1) if the correct
-#'     model has a delta-AIC value of zero or (2) if all alternative
-#'     models have a delta-AIC larger than two OR if all
+#'     HSD Tukey if necessary and by model selection AIC corrected for
+#'     small samples (AICc). The models compared are that the expected
+#'     value of all values are the same, that the expected values of
+#'     each sample are different, or that one group is different of
+#'     the other two. The evidence weight and delta-AIC of the null
+#'     hypothesis is then calculated from the AIC difference between
+#'     the models.  Two alternative criteria are used to evaluate if
+#'     the model selection reached a right conclusion: (1) if the
+#'     correct model has a delta-AIC value of zero or (2) if all
+#'     alternative models have a delta-AIC larger than two OR if all
 #'     models with delta-AIC < 2 are nested and include the correct
-#'     model. For the situations simulated the
-#'     second condition of the last criterium implies that the correct
-#'     model has the fewer number of parameters within a set of nested
-#'     selected models. This is
-#'     an additional parsimony condition to solve the problem of
-#'     selected models with uninformative parameters
-#'     (Arnold 2010, Geweke & Meese 1981).
-#'     Also, the M-error an S-error (Gelman & Carlin 2014)
-#'     are provided. The M-error is
-#'     calculated by dividing the estimated difference among groups by
-#'     the true difference. The S-error is a binary variable that has value 1 (TRUE)
-#'     if the estimated difference among groups is of opposite sign of the true difference.
+#'     model. For the situations simulated the second condition of the
+#'     last criterium implies that the correct model has the fewer
+#'     number of parameters within a set of nested selected
+#'     models. This is an additional parsimony condition to solve the
+#'     problem of selected models with uninformative parameters
+#'     (Arnold 2010, Geweke & Meese 1981).  Also, the M-error an
+#'     S-error (Gelman & Carlin 2014) are provided. The M-error is the
+#'     absolute value of the ratio between the estimated difference
+#'     among groups by the true difference. The S-error is a binary
+#'     variable that has value 1 (TRUE) if the estimated difference
+#'     among groups is of opposite sign of the true difference.
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
 #'     errors. Perspectives on Psychological Science, 9(6), 641-651.
@@ -307,8 +306,8 @@ wp.anova <- function(std.diff, sd1, N, mu1){
     dAICs <- AICs - min(AICs)
     if(mu1 != 0){
         IC <- confint(m123, level=0.85)
-        M.error <- coef(m3)[2]/mu1
-        S.error <- M.error < 0
+        M.error <- abs(coef(m3)[2]/mu1)
+        S.error <- (coef(m3)[2]/mu1) < 0
         aic.right.1 <- dAICs[4] == 0
         ##aic.right.2 <- dAICs[4]<2 & ( all(dAICs[-4]>2) | (all(dAICs[1:2]>2) & dAICs[5]<2 & IC[2,1]<=0 & IC[2,2]>=0) )
         aic.right.2 <- dAICs[4]<2 & all(dAICs[1:2]>2)
@@ -334,50 +333,48 @@ wp.anova <- function(std.diff, sd1, N, mu1){
 #' NHT and IT  comparison for regression test allowing collinearity
 #'
 #' This function simulates samples from a Gaussian distribution whose
-#' mean is a linear function of a continuous predictor variable drawn from a standard
-#' Gaussian distribution. A second variable that is used as another
-#' predictor is also drawn, wich can have any correlation to the first
-#' one, but does not affect the mean of the response variable.
-#' The significance of the effect of each predictor is evaluated with
-#' Wald marginal tests. The effects are also tested comparing
-#' the AIC of linear models with each or both predictors. Four linear
-#' regressions are then fit (with no effect -- null hypothesis --,
-#' single effect of each predictor and additive effects of both
-#' predictors). The
-#' effects of each predictor are the checked by a null hypothesis test
-#' (marginal Wald test from function \code{summary} and by model
-#' selection using AIC corrected for small samples. For each test it
-#' is considered a rightful conclusion if only the correct predictor
-#' is spoted as a true effect, or if the null hypothesis is identified
-#' in the absence of effects (beta = 0)
+#' mean is a linear function of a continuous predictor variable drawn
+#' from a standard Gaussian distribution. A second variable that is
+#' used as another predictor is also drawn, wich can have any
+#' correlation to the first one, but does not affect the mean of the
+#' response variable.  The significance of the effect of each
+#' predictor is evaluated with Wald marginal tests. The effects are
+#' also tested comparing the AIC of linear models with each or both
+#' predictors. Four linear regressions are then fit (with no effect --
+#' null hypothesis --, single effect of each predictor and additive
+#' effects of both predictors). The effects of each predictor are the
+#' checked by a null hypothesis test (marginal Wald test from function
+#' \code{summary} and by model selection using AIC corrected for small
+#' samples. For each test it is considered a rightful conclusion if
+#' only the correct predictor is spoted as a true effect, or if the
+#' null hypothesis is identified in the absence of effects (beta = 0)
 #'
-#' @param std.beta real number, standardized effect (aka standardized
-#'     slope coefficient) of the first predictor
-#'     on the response variable (aka dependent variable). Ignored if
-#'     beta is provided.
+#'@param std.beta real number, standardized effect (aka standardized
+#'     slope coefficient) of the first predictor on the response
+#'     variable (aka dependent variable). Ignored if beta is provided.
 #' @param sd1 real positive, standard deviation of the effect, which
-#'     is the standard deviation of the Gaussian of the response variable.
+#'     is the standard deviation of the Gaussian of the response
+#'     variable.
 #' @param N integer positive, size of the sample.
 #' @param beta real number, effect (aka slope) of the first predictor
 #'     on the response variable (aka dependent variable).
 #' @param rpears real number, Pearson correlation coefficient between
 #'     the two variables to be tested as predictors (aka independent
-#'     variables). Values of  \code{rpears} different from zero
-#'     creates collinearity between the two predictor variables.
-#' @return a vector with of size 8: the p-value of a F-test for the
-#'     null hypothesis of no effect; the Akaike evidence weight of the null
-#'     hypothesis compared to the alternative models of effect of each
-#'     predictor or both;
-#'     the difference between Akaike Information Criteria of the null
-#'     to the most plausible hypothesis; the ratio between the
-#'     estimated effect of the first predictor and the true effect, if
-#'     the effect when significant is in the opposite direction (S
-#'     and M type errors, Gelman & Carlin, 2014), if the null hypothesis test
-#'     reached to the right conclusion (yes=1, 
-#'     no=0),
-#'     if the model selection based on AICs reached to the right
-#'     conclusion according to two criteria (see details, yes=1, no=0).
-#' @details This function samples two predictor variables from a
+#'     variables). Values of \code{rpears} different from zero creates
+#'     collinearity between the two predictor variables.
+#'@return a vector with of size 8: the p-value of a F-test for the
+#'     null hypothesis of no effect; the Akaike evidence weight of the
+#'     null hypothesis compared to the alternative models of effect of
+#'     each predictor or both; the difference between Akaike
+#'     Information Criteria of the null to the most plausible
+#'     hypothesis; the absolute ratio between the estimated effect of
+#'     the first predictor and the true effect and if the effect is in
+#'     the opposite direction (S and M type errors, Gelman & Carlin,
+#'     2014); if the null hypothesis test reached to the right
+#'     conclusion (yes=1, no=0); if the model selection based on AICs
+#'     reached to the right conclusion according to two criteria (see
+#'     details, yes=1, no=0).
+#'@details This function samples two predictor variables from a
 #'     bivariate Gaussian with correlation term set by the user. The
 #'     marginal distributions of both predictors are standard
 #'     Gaussians (zero mean and unity standard error). A response
@@ -399,9 +396,9 @@ wp.anova <- function(std.diff, sd1, N, mu1){
 #'     selected models with uninformative parameters
 #'     (Arnold 2010, Geweke & Meese 1981).
 #'     If there is an effect of the predictor (beta!=0)
-#'     it is also calculated the ratio between the estimated and true
+#'     it is also calculated the absolute ratio between the estimated and true
 #'     effect value (type-M error, Gelman & Carlin 2014) and
-#'     if the estimated and true effect are of the same sign (type-S error).
+#'     if the estimated effect has the incorrect sign (type-S error).
 #' 
 #' @references Gelman, A., & Carlin, J. (2014). Beyond power
 #'     calculations assessing type s (sign) and type m (magnitude)
@@ -437,8 +434,8 @@ wp.lm <- function(std.beta, sd1, N, beta, rpears=0){
             all(dAICs[-c(2,3)]<2)
     }
     else{
-        M.error <-  coef(m1)[2]/beta
-        S.error <- M.error < 0
+        M.error <-  abs(coef(m1)[2]/beta)
+        S.error <- (coef(m1)[2]/beta) < 0
         nht.right <- p.vals[1]<0.05 & p.vals[2]>0.05
         aic.right.1 <- dAICs[2]==0
         #aic.right.2 <- dAICs[2]==0 & all(dAICs[-2]>2)
@@ -483,107 +480,17 @@ sim.averages <- function(effect, st.dev, sample.size, nrep,
 ## Same as above, but when the null hypothesis is true
 sim.averages.null <- function(st.dev, sample.size, nrep, function.name, ...)
     sim.averages(effect = 0, st.dev=st.dev, sample.size=sample.size, nrep=nrep, function.name=function.name, ...)
-                              
-## Plot functions ###
 
-## % of rightfull conclusions x effect size
-
-p1b <- function(data, legend = TRUE, pos.leg="bottomright",
-                AIC1 = TRUE, AIC2 = TRUE, H0= FALSE,
-                colours=c("black","blue","red"),
-                ylab="P rightfull conclusions",
-                xlab="Effect size", ylim, ...){
-    dots <- list(...)
-    if(H0){
-        Y <- data$SD/sqrt(data$N)
-        if(xlab!="") xlab="Standard error"
-    }
-    else{
-        Y <- data$D
-        if(xlab!="") xlab="Effect size"
-    }
-    if(!AIC2&missing(ylim))
-        ylim <- with(data, range(c(p.NHT.right,p.AIC.right)))
-    else if(!AIC1&missing(ylim))
-        ylim <- with(data, range(c(p.NHT.right,p.AIC.right.2)))
-    else if(missing(ylim))
-        ylim <- with(data, range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)))
-    plot(p.NHT.right ~ Y, data=data,
-         ylim= ylim,
-         xlab=xlab, ylab=ylab, col=colours[1], ...)
-    if(AIC1) ## exibe resultados do primeiro criterio de AIC
-        points(p.AIC.right ~ Y, data=data, col=colours[2], ...)
-    if(AIC2)
-        points(p.AIC.right.2 ~ Y, data=data, col=colours[3], ...)
-    if(legend)
-        legend(pos.leg,
-               c("NHT", "IT crit. 1", "IT crit. 2"),
-       pch=19, col=colours, bty="n")
+## Function to estimate M and S errors for Gaussian
+## Gelman & Carlin Perspectives on Psychological Science 2014, Vol. 9(6) 641 –651
+function(A, s, alpha=.05, df=Inf, n.sims=10000){
+    z <- qt(1-alpha/2, df)
+    p.hi <- 1 - pt(z-A/s, df)
+    p.lo <- pt(-z-A/s, df)
+    power <- p.hi + p.lo
+    typeS <- p.lo/power
+    estimate <- A + s*rt(n.sims,df)
+    significant <- abs(estimate) > s*z
+    exaggeration <- mean(abs(estimate)[significant])/A
+    return(c(power=power, typeS=typeS, exaggeration=exaggeration)) # changed from a list to a named vector
 }
-
-## Proportion of mismatching conclusions
-
-p2b <- function(data, legend = TRUE, pos.leg="bottomright", AIC2 = TRUE, ...){
-    plot(p.mismatch ~ D, data=data, cex=0.25,
-         ylim=range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)),
-         xlab="Effect size", ylab="P mismatching conclusions", col = "blue", ...)
-    if(AIC2)
-        points(p.mismatch.2 ~ D, data=data, cex=0.25, col="red")
-    if(legend)
-        legend(pos.leg,
-               c(
-                 expression(paste("NHT x ", Delta,"AIC = 0")),
-                 expression(paste("NHT x ",Delta,"AIC = 0, all other ", Delta, "AIC > 2"))),
-       pch=19, col=c("blue", "red"), bty="n")
-}
-
-## Mean M-error x effect size
-
-p3b <- function(data, legend = TRUE, pos.leg="bottomright",
-                AIC1 = TRUE, AIC2 = TRUE,
-                colours=c("black","blue","red"),
-                ylab="Mean M-error",
-                xlab="Effect size", ylim, ...){
-    if(!AIC2&missing(ylim))
-        ylim <- with(data, range(c(mean.NHT.M,mean.AIC.M)))
-    else if(!AIC1&missing(ylim))
-        ylim <- with(data, range(c(mean.NHT.M,mean.AIC.M.2)))
-    else if(missing(ylim))
-        ylim <- with(data, range(c(mean.NHT.M,mean.AIC.M, mean.AIC.M.2)))
-    plot(mean.NHT.M ~ D, data=data,
-         ylim=ylim,
-         xlab=xlab, ylab=ylab, col= colours[1], ...)
-    if(AIC1) 
-        points(mean.AIC.M ~ D, data=data, col=colours[2], ...)
-    if(AIC2)
-        points(mean.AIC.M.2 ~ D, data=data, col=colours[3], ...)
-    if(legend)
-        legend(pos.leg,
-               c("NHT", "IT crit. 1", "IT crit. 2"),
-       pch=19, col=colours, bty="n")
-}
-
-## P S-error x effect size
-
-p4b <- function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE,
-                ylab="Mean S-error",
-                xlab="Effect size", ylim, ...){
-    if(!AIC2&missing(ylim))
-        ylim <- with(data, range(c(p.NHT.S,p.AIC.S)))
-    else if(!AIC1&missing(ylim))
-        ylim <- with(data, range(c(p.NHT.S,p.AIC.S.2)))
-    else if(missing(ylim))
-        ylim <- with(data, range(c(p.NHT.S,p.AIC.S, p.AIC.S.2)))
-    plot(p.NHT.S ~ D, data=data,
-         ylim=ylim,
-         xlab=xlab, ylab=ylab, ...)
-    if(AIC1)
-        points(p.AIC.S ~ D, data=data, col="blue", ...)
-    if(AIC2)
-        points(p.AIC.S.2 ~ D, data=data, col="red", ...)
-    if(legend)
-        legend(pos.leg,
-               c("NHT", "IT crit. 1", "IT crit. 2"),
-       pch=19, col=c("black", "blue", "red"), bty="n")
-}
-
