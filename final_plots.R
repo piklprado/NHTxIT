@@ -203,3 +203,22 @@ lines(exaggeration ~ D.seq, data=pGauss, col="blue")
 ## M-error x S-error
 plot(p.NHT.S ~ mean.NHT.M, data = t.results, cex=0.25, ylim=c(0,.5))
 points(p.AIC.S.2 ~ mean.AIC.M.2, data = t.results, cex=0.25, col="blue")
+
+
+## Contour plots
+library(akima)
+fld <- with(t.results, interp(mean.NHT.M, p.NHT.S, p.NHT.right))
+with(fld, filled.contour(x, y, z, xlim=c(0,5), ylim=c(0,0.1)))
+
+fld2 <- with(t.results, interp(mean.AIC.M.2, p.AIC.S.2, p.AIC.right.2))
+with(fld2, filled.contour(x, y, z))
+
+## M x S error
+limite <- 0.75
+plot(p.AIC.S.2~mean.AIC.M.2, data=t.results, type="n")
+points(p.AIC.S.2~mean.AIC.M.2, data=t.results, subset=p.AIC.right.2>limite, col="red", cex=0.25)
+points(p.AIC.S.2~mean.AIC.M.2, data=t.results, subset=p.AIC.right.2<limite, cex=0.25)
+
+plot(p.NHT.S~mean.NHT.M, data=t.results, type="n", ylim=c(0,0.4), xlim=c(0,12))
+points(p.NHT.S~mean.NHT.M, data=t.results, subset=p.NHT.right>limite, col="red", cex=0.25)
+points(p.NHT.S~mean.NHT.M, data=t.results, subset=p.NHT.right<limite, cex=0.25)
