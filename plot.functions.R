@@ -4,7 +4,7 @@
 
 p1b <- function(data, legend = TRUE, pos.leg="bottomright",
                 AIC1 = TRUE, AIC2 = TRUE, H0= FALSE,
-                colours=c("black","blue","red"),
+                colours=c("black","red","blue"),
                 ylab="P rightfull conclusions",
                 xlab="Effect size", ylim, ...){
     dots <- list(...)
@@ -32,10 +32,10 @@ p1b <- function(data, legend = TRUE, pos.leg="bottomright",
     if(legend)
         legend(pos.leg,
                c("NHT", "IT crit. 1", "IT crit. 2"),
-       pch=19, col=colours, bty="n")
+       pch=19, col=colours[c(1,3,2)], bty="n")
 }
 
-## Proportion of mismatching conclusions
+## Proportion of mismatching conclusions x Effect size
 
 p2b <- function(data, legend = TRUE, pos.leg="bottomright", AIC2 = TRUE, ...){
     plot(p.mismatch ~ D, data=data, cex=0.25,
@@ -55,7 +55,7 @@ p2b <- function(data, legend = TRUE, pos.leg="bottomright", AIC2 = TRUE, ...){
 
 p3b <- function(data, legend = TRUE, pos.leg="bottomright",
                 AIC1 = TRUE, AIC2 = TRUE,
-                colours=c("black","blue","red"),
+                colours=c("black","red","blue"),
                 ylab="Mean M-error",
                 xlab="Effect size", ylim,
                 pred.line=FALSE, x.pred, y.pred, ...){
@@ -83,14 +83,14 @@ p3b <- function(data, legend = TRUE, pos.leg="bottomright",
     if(legend)
         legend(pos.leg,
                c("NHT", "IT crit. 1", "IT crit. 2"),
-       pch=19, col=colours, bty="n")
+       pch=19, col=colours[c(1,3,2)], bty="n")
 }
 
 ## Proportion of S-error x effect size
 
 p4b <- function(data, legend = TRUE, pos.leg="bottomright",
                 AIC1 = TRUE, AIC2 = TRUE,
-                colours=c("black","blue","red"),
+                colours=c("black","red","blue"),
                 ylab="Mean M-error",
                 xlab="Effect size", ylim, ...){
     if(!AIC2&missing(ylim))
@@ -109,37 +109,13 @@ p4b <- function(data, legend = TRUE, pos.leg="bottomright",
     if(legend)
         legend(pos.leg,
                c("NHT", "IT crit. 1", "IT crit. 2"),
-       pch=19, col=colours, bty="n")
-}
-
-
-
-    function(data, legend = TRUE, pos.leg="bottomright", AIC1 = TRUE, AIC2 = TRUE,
-                ylab="Mean S-error",
-                xlab="Effect size", ylim, ...){
-    if(!AIC2&missing(ylim))
-        ylim <- with(data, range(c(p.NHT.S,p.AIC.S)))
-    else if(!AIC1&missing(ylim))
-        ylim <- with(data, range(c(p.NHT.S,p.AIC.S.2)))
-    else if(missing(ylim))
-        ylim <- with(data, range(c(p.NHT.S,p.AIC.S, p.AIC.S.2)))
-    plot(p.NHT.S ~ D, data=data,
-         ylim=ylim,
-         xlab=xlab, ylab=ylab, ...)
-    if(AIC1)
-        points(p.AIC.S ~ D, data=data, col="blue", ...)
-    if(AIC2)
-        points(p.AIC.S.2 ~ D, data=data, col="red", ...)
-    if(legend)
-        legend(pos.leg,
-               c("NHT", "IT crit. 1", "IT crit. 2"),
-       pch=19, col=c("black", "blue", "red"), bty="n")
+       pch=19, col=colours[c(1,3,2)], bty="n")
 }
 
 ## Mean M-error x proportion rightfull conclusions
 p5b <- function(data, legend = TRUE, pos.leg="bottomright",
                 AIC1 = TRUE, AIC2 = TRUE,
-                colours=c("black","blue","red"),
+                colours=c("black","red","blue"),
                 ylab="Mean M-error",
                 xlab="Effect size", ylim, xlim, ...){
     if(!AIC2){
@@ -168,10 +144,11 @@ p5b <- function(data, legend = TRUE, pos.leg="bottomright",
     if(legend)
         legend(pos.leg,
                c("NHT", "IT crit. 1", "IT crit. 2"),
-       pch=19, col=colours, bty="n")
+       pch=19, col=colours[c(1,3,2)], bty="n")
 }
 
 ## Proportion of S-error x proportion rightfull conclusions
+
 p6b <- function(data, legend = TRUE, pos.leg="bottomright",
                 AIC1 = TRUE, AIC2 = TRUE,
                 colours=c("black","blue","red"),
@@ -189,12 +166,14 @@ p6b <- function(data, legend = TRUE, pos.leg="bottomright",
         if(missing(xlim))
         xlim <- with(data, range(c(p.NHT.right,p.AIC.right.2)))
         }
-    else if(missing(ylim))
-        ylim <- with(data, range(c(p.NHT.S,p.AIC.S, p.AIC.S.2)))
-    else if(missing(xlim))
-        xlim <- with(data, range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)))
+    else {
+            if(missing(ylim))
+                ylim <- with(data, range(c(p.NHT.S,p.AIC.S, p.AIC.S.2)))
+            if(missing(xlim))
+                xlim <- with(data, range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)))
+            }
     plot(p.NHT.S ~ p.NHT.right, data=data,
-         ylim=ylim,
+         ylim=ylim, xlim=xlim,
          xlab=xlab, ylab=ylab, col= colours[1], ...)
     if(AIC1) 
         points(p.AIC.S ~ p.AIC.right, data=data, col=colours[2], ...)
@@ -203,6 +182,6 @@ p6b <- function(data, legend = TRUE, pos.leg="bottomright",
     if(legend)
         legend(pos.leg,
                c("NHT", "IT crit. 1", "IT crit. 2"),
-       pch=19, col=colours, bty="n")
+       pch=19, col=colours[c(1,3,2)], bty="n")
 }
 
