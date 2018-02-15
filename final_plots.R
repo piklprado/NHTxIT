@@ -10,7 +10,8 @@ load("simulations/lmresults.RData")
 ## Plot Parameters (from http://shinyapps.org/apps/RGraphCompendium/)
 #par(cex.main = 1.5, mar = c(5, 6, 4, 4) + 0.1, mgp = c(3.5, 1, 0), 
 #    cex.lab = 1.5, font.lab = 2, cex.axis = 1.3, bty = "n", las = 1)
-greycol <- rgb(red = 190, green = 190, blue = 190, alpha = 95, maxColorValue = 255)
+greycol <- rgb(red = 190, green = 190, blue = 190, alpha = 95,
+               maxColorValue = 255)
 greycol2 <- rgb(0, 0, 0, alpha = 0.7)
 grey1 <- grey.colors(10, alpha=0.3)[1]
 grey2 <- grey.colors(10, alpha=0.3)[10]
@@ -146,10 +147,14 @@ segments(x0=c(a[1], a[1], a[2], a[2]),
 lines(x, y2, lwd=3)
 lines(x, y1, lwd=3, col="darkgrey")
 text(label=c("a", "b"), x= a, y=c(-0.01, -0.01))
-arrows(x0=min(x)*.6, y0=dt(a[1], df=20), y1=dt(a[1], df=20, ncp=1), angle=90, code=3, length=0.05, lwd=1.5)
-text(x=min(x)*.6, y=c(dt(a[1], df=20), dt(a[1], df=20, ncp=1)), labels=c("H0(a)", "H1(a)"), pos=2)
-arrows(x0=max(x)*.85, y0=dt(a[2], df=20), y1=dt(a[2], df=20, ncp=1), angle=90, code=3, length=0.05, lwd=1.5)
-text(x=max(x)*.85, y=c(dt(a[2], df=20), dt(a[2], df=20, ncp=1)), labels=c("H0(b)", "H1(b)"), pos=4)
+arrows(x0=min(x)*.6, y0=dt(a[1], df=20), y1=dt(a[1], df=20, ncp=1),
+       angle=90, code=3, length=0.05, lwd=1.5)
+text(x=min(x)*.6, y=c(dt(a[1], df=20), dt(a[1], df=20, ncp=1)),
+     labels=c("H0(a)", "H1(a)"), pos=2)
+arrows(x0=max(x)*.85, y0=dt(a[2], df=20), y1=dt(a[2], df=20, ncp=1),
+       angle=90, code=3, length=0.05, lwd=1.5)
+text(x=max(x)*.85, y=c(dt(a[2], df=20), dt(a[2], df=20, ncp=1)),
+     labels=c("H0(b)", "H1(b)"), pos=4)
 dev.off()
 
 
