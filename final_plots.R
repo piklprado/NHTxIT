@@ -1,7 +1,14 @@
-## Plot functions
+## Functions used to produce the plots of the paper
+## 'Towards a pragmatic use of statistics in ecology, by Leonardo Castilho and Paulo Inacio Prado'
+## For any question please use the issue pages at GitHub: https://github.com/piklprado/NHTxIT/issues
+
 source("functions.R")
 source("plot.functions.R")
-## Load simulation results
+## Load simulation results.
+## The R binaries with the simulation results are available under request to the authors,
+## but you can reproduce the results running the simmulations again
+##(script 'simulation_rightfull_conclusions.R')
+## Please correct file paths accordingly
 load("simulations/tresults.RData")
 load("simulations/corresults.RData")
 load("simulations/anovaresults.RData")

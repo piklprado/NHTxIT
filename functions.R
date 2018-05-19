@@ -1,5 +1,7 @@
 ## functions.R
-## Functions to run simulations in Castilho & Prado
+## Functions to run simulations done for the paper
+## 'Towards a pragmatic use of statistics in ecology, by Leonardo Castilho and Paulo Inacio Prado'
+## For any question please use the issue pages at GitHub: https://github.com/piklprado/NHTxIT/issues
 library(bbmle)
 library(pse)
 library(mvtnorm)
@@ -115,7 +117,7 @@ wp.ttest <- function(tval, sd1, N, mu2){
 #'     expressed as a t-value (t = r sqrt((n-2)/(1-r^2))).
 #' @param sd1 real positive, standard deviations of the marginal
 #'     Gaussian populations from which the samples are drawn.
-#' @param N integer positive, size of the two samples.
+#' @param N integer positive, size of the bivariate sample.
 #' @param rpears real number, the true Pearson correlation between the
 #'     two variables sampled. If missing calculated from \code{tval}.
 #'@return a vector with of size 8: the p-value of a correlation t-test

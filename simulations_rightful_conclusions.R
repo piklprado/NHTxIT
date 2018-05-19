@@ -1,3 +1,11 @@
+                                        # simulations_rightful_conclusions
+
+## Codes of the simulations, as ran to generate the results in the paper
+
+## Simulations for each test design creates a parallel virtual cluster, run the simulations and close the cluster.
+## This made the code a bit redundant, but also allows to run any simulation independently.
+## Please refer to documentation of 'parallel' to tune the use in your computer
+
 source("functions.R")
 library(parallel)
 
