@@ -144,8 +144,8 @@ par(cex= 1.25, lwd=2)
 #par(cex.main = 1.5, mar = c(5, 6, 4, 4) + 0.1, mgp = c(3.5, 1, 0), 
 #    cex.lab = 1.5, font.lab = 2, cex.axis = 1.3, cex=2)
 plot(x, y1, type="n", axes=FALSE, xlab="", ylab="")
-polygon(c(a[1],x[x>a[1]]), c(0,y1[x>a[1]]), col=grey1, lty=0)
-polygon(c(a[2],x[x>a[2]]), c(0,y1[x>a[2]]), col=grey2, lty=0)
+polygon(c(a[1],x[x>a[1]]), c(0,y1[x>a[1]]), col="grey", lty=0)
+polygon(c(a[2],x[x>a[2]]), c(0,y1[x>a[2]]), col="black", lty=0)
 segments(x0=c(a[1], a[1], a[2], a[2]),
          y0=c(dt(a[1], df=20), dt(a[1], df=20, ncp=1), dt(a[2], df=20), dt(a[2], df=20, ncp=1)),
          x1=c(min(x)*.6, min(x)*.6, max(x)*.85, max(x)*.85), lty=2,
