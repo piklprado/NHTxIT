@@ -4,5 +4,5 @@
 .RData
 .Rhistory
 *.pdf
-not_for_gitgub/
 .dropbox
+not_for_github

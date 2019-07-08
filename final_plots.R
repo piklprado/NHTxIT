@@ -32,7 +32,7 @@ pGauss2 <- as.data.frame(t(sapply(D.seq, retrodesign2, s=1, alpha = 0.05)))
 
 
 ## Probabilities of rightfull conclusions when H0 is false
-pdf("../overleaf/figures/prightH1.pdf", width=8, height=8)
+pdf("../overleaf/figures/Fig1.pdf", width=8, height=8)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -52,7 +52,7 @@ mtext("Proportion of rightfull conclusions", side=2, outer=TRUE, cex=2, line=0.5
 dev.off()
 
 ## M-errors
-pdf("../overleaf/figures/M-error.pdf", width=8, height=8)
+pdf("../overleaf/figures/Fig2.pdf", width=8, height=8)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -72,7 +72,7 @@ mtext("Mean M-error rate", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
 
 ## S-errors
-pdf("../overleaf/figures/S-error.pdf", width=8, height=8)
+pdf("../overleaf/figures/Fig3.pdf", width=8, height=8)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -92,7 +92,7 @@ mtext("Proportion of S-error", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
 
 ## P x Akaike weights
-pdf("../overleaf/figures/pXweights.pdf", width=8, height=8)
+pdf("../overleaf/figures/Fig4.pdf", width=8, height=8)
 par(cex.main = 1.5, lwd=2,
     mar = c(5.5, 5.5, 4, 2) + 0.1,
     mgp = c(3.5, 0.5, 0), 
@@ -126,7 +126,7 @@ st <- function(n, m) sqrt((n-1)*(exp(2*m/n)-1))
 ## Critical t for a certain significance value, from the t distribution
 cp <- function(n, alpha) qt(p= 1-alpha/2, df = n-1)
 ## Fig S1
-pdf("../overleaf/figures/figS1.pdf")
+pdf("../overleaf/figures/FigS1.pdf")
 par(cex.axis=1.5, cex.lab=1.75, las=1, mar = c(5, 6, 4, 2), mgp = c(4,1,0), lwd=1.5)
 curve(cp(x, alpha = 0.05), 3, 30, xlab= "sample size", ylab="| t | value to reject H0", lty=2, lwd=2)
 curve(st(x, m=2), add=TRUE, lwd = 2)
@@ -139,7 +139,7 @@ x <- seq(-4,5.8,by=0.01)
 y1 <- dt(x, df=20)
 y2 <- dt(x, df=20, ncp = 1)
 a <- c(0.7,2.5)
-pdf("../overleaf/figures/weights_and_ttest.pdf", width=8, height=6.5)
+pdf("../overleaf/figures/FigS2.pdf", width=8, height=6.5)
 par(cex= 1.25, lwd=2)
 #par(cex.main = 1.5, mar = c(5, 6, 4, 4) + 0.1, mgp = c(3.5, 1, 0), 
 #    cex.lab = 1.5, font.lab = 2, cex.axis = 1.3, cex=2)
@@ -166,7 +166,7 @@ dev.off()
 
 
 ## P rightfull conclusions for both IT criteria
-pdf("../overleaf/figures/Sup_prightH1.pdf", width=12, height=4.5)
+pdf("../overleaf/figures/FigS3.pdf", width=12, height=4.5)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -189,7 +189,7 @@ dev.off()
 
 
 ## M-Errors
-pdf("../overleaf/figures/Sup_M-error.pdf", width=12, height=4.5)
+pdf("../overleaf/figures/FigS4.pdf", width=12, height=4.5)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -211,7 +211,7 @@ mtext("Mean M-error rate", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
 
 ## S-Errors
-pdf("../overleaf/figures/Sup_S-error.pdf", width=12, height=4.5)
+pdf("../overleaf/figures/FigS5.pdf", width=12, height=4.5)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
