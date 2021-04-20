@@ -1,7 +1,3 @@
-## functions.R
-## Functions to run simulations done for the paper
-## 'Towards a pragmatic use of statistics in ecology, by Leonardo Castilho and Paulo Inacio Prado'
-## For any question please use the issue pages at GitHub: https://github.com/piklprado/NHTxIT/issues
 library(bbmle)
 library(pse)
 library(mvtnorm)
@@ -207,8 +203,7 @@ wp.cortest <- function(tval, sd1, N, rpears){
 #' same distribution is evaluated with a F-test. If the null
 #' hypothesis is rejected (p<0.05) the differences among samples is
 #' then tested with a
-#' post-hoc Tukey HSD test. The differences among groups
-#' is also tested comparing
+#' post-hoc Tukey HSD test. The differences among groups is also tested comparing
 #' the AIC of linear models with or without a group label as
 #' predictors.
 #'
@@ -314,27 +309,24 @@ wp.anova <- function(std.diff, sd1, N, mu1){
         M.error <- abs(coef(m3)[2]/mu1)
         S.error <- (coef(m3)[2]/mu1) < 0
         aic.right.1 <- dAICs[4] == 0
-        aic.right.2 <- dAICs[4]<2 & all(dAICs[1:3]>2)
+        ##aic.right.2 <- dAICs[4]<2 & ( all(dAICs[-4]>2) | (all(dAICs[1:2]>2) & dAICs[5]<2 & IC[2,1]<=0 & IC[2,2]>=0) )
+        aic.right.2 <- dAICs[4]<2 & all(dAICs[1:2]>2)
      }
     if(mu1 == 0){
         M.error <-  NA
         S.error <- NA
         aic.right.1 <- dAICs[1] == 0
-        aic.right.2 <- dAICs[1] < 2 
-        ## aic.right.2 <- (dAICs[1]==0 & all(dAICs[-1]>2)) |
-        ##     all(dAICs[-c(2,3)]<2) | all(dAICs[-c(2,4)]<2) |
-        ##     all(dAICs[-c(3,4)]<2) |all(dAICs[-c(2,3,5)]<2) |
-        ##     all(dAICs[-c(2,4,5)]<2) |
-        ##     all(dAICs[-c(3,4,5)]<2) | all(dAICs[-c(2,3,4)]<2)
+        aic.right.2 <- (dAICs[1]==0 & all(dAICs[-1]>2)) |
+            all(dAICs[-c(2,3)]<2) | all(dAICs[-c(2,4)]<2) |
+            all(dAICs[-c(3,4)]<2) |all(dAICs[-c(2,3,5)]<2) | all(dAICs[-c(2,4,5)]<2) |
+            all(dAICs[-c(3,4,5)]<2) | all(dAICs[-c(2,3,4)]<2)
     }
     #browser(expr=!aic.right.2)
     w <- exp(-dAICs/2)
     wi <- w/sum(w)
-    results <- c(pF, wi[1], dAICs[1], M.error, S.error, aov.right,
-                 aic.right.1, aic.right.2)
+    results <- c(pF, wi[1], dAICs[1], M.error, S.error, aov.right, aic.right.1, aic.right.2)
     names(results) <- c("p.value", "Akaike.weight.H0",
-                        "deltaAIC.H0", "M.error", "S.error",
-                        "NHT.right", "AIC.right", "AIC.right.delta")
+                        "deltaAIC.H0", "M.error", "S.error", "NHT.right", "AIC.right", "AIC.right.delta")
     return(results)
 }
 
@@ -389,8 +381,7 @@ wp.anova <- function(std.diff, sd1, N, mu1){
 #'     variable is then simulated from a Gaussian distribution that
 #'     has the mean value proportional to the first predictor. The
 #'     proportionality factor is the effect, or slope , of the
-#'     predictor and is set with argument \code{beta} or \{std.beta}.
-#'     The standard
+#'     predictor and is set with argument \code{beta} or \{std.beta}. The standard
 #'     deviation of the response is set by the argument \code{sd1}.
 #'     Two alternative criteria are used to evaluate if the 
 #'     model selection reached a right conclusion: (1) if the correct
@@ -451,94 +442,42 @@ wp.lm <- function(std.beta, sd1, N, beta, rpears=0){
         aic.right.2 <- dAICs[2]<2 & all(dAICs[c(1,3)]>2)
     }
     #browser(expr=!aic.right.2&nht.right)
-    results <- c(pF, wi[1], dAICs[1], M.error, S.error, nht.right,
-                 aic.right.1, aic.right.2)
+    results <- c(pF, wi[1], dAICs[1], M.error, S.error, nht.right, aic.right.1, aic.right.2)
     names(results) <- c("p.value.F", "Akaike.weight.H0", "deltaAIC.H0",
-                        "M.error", "S.error", "NHT.right", "AIC.right",
-                        "AIC.right.delta")
+                        "M.error", "S.error", "NHT.right", "AIC.right", "AIC.right.delta")
     return(results)
 }
 
 
-#' Replicates the simulations above
-#'
-#' A function to run replicates of any function above for a given
-#' combination of parameters standard effect, standard deviations and
-#' sample sizes and the simulation function to run 
-#'
-#'@param effect real number, standardized effect.
-#'@param st.dev real positive, standard deviation of the effect, which
-#'     is the standard deviation of the Gaussian of the response
-#'     variable.
-#' @param sample.size integer positive, size of the sample.
-#' @param nrep number of rpetitions of the simulation to run. For each
-#'     simulation a new sample with the specified parameters wil be drawn.
-#' @param function.name character, the name of the simulation function
-#'     to run.
-#' @param summary.only logical, if TRUE the function returns only the
-#'     summary statistics of the nrep simulations. If FALSE the
-#'     function returns also a data frame with the results of each
-#'     simulation (see details)
-#' @param ... further arguments to be passed to the simulation
-#'     function defined by \code{function.name}
-#'@return if summary.only is TRUE, a named vector with of size 13:
-#'     proportion of simulations in which the NHT, IT and IT +
-#'     uninformative parameter adjustment (IT2 henceforth) reached to a rightful
-#'     conclusions; proportion of simulations with mismatch between
-#'     NHT and IT and between NHT and IT2; mean exageration rate for
-#'     NHT, IT nd IT2; proportion of significant effects that were
-#'     estimated with wrong sign (S-error), mean p-value of NHT and
-#'     mean evidence weight value of IT. A list with the named vector
-#'     above and a data frame with the output of the simulation
-#'     function for each simulation.
+## A function to run replicates of any function above for
+## a given combination of parameters standard effect, standard deviations
+## and sample sizes. 
 sim.averages <- function(effect, st.dev, sample.size, nrep,
-                         function.name, summary.only=TRUE, ...){
+                         function.name, ...){
     dots <- list(...)
     f1 <- get(function.name)
-    raw <- replicate(nrep,
-                     mapply(f1, effect, st.dev, sample.size, MoreArgs = dots),
+    raw <- replicate(nrep, mapply(f1, effect, st.dev, sample.size, MoreArgs = dots),
                      simplify=TRUE)
-    results <- c(
-        ## Prop rightful conclusions NHT
-        sum(raw[6,])/nrep,
-        ## Prop rightfull conclusions IT by the criterium 1:
-        ## deltaAIC = 0 for the right model
-        sum(raw[7,])/nrep,
-        ## Prop rightfull conclusions IT by the criterium 2:
-        ## deltaAIC > 2 for all wrong models
-        sum(raw[8,])/nrep,
-        ## Prop mismatches in conclusions NHT x IT criterium 1
-        sum(raw[6,]!=raw[7,])/nrep,
-        ## Prop mismatches in conclusions NHT x IT crit 2
-        sum(raw[6,]!=raw[8,])/nrep,
-        ## Mean M-error NHT
-        mean(raw[4,raw[6,]==1], na.rm=TRUE),
-        ## Mean M-error IT by the crit 1
-        mean(raw[4,raw[7,]==1], na.rm=TRUE),
-        ## Mean M-error IT by the crit 2
-        mean(raw[4,raw[8,]==1], na.rm=TRUE),
-        ## Mean S-error NHT
-        mean(raw[5,raw[6,]==1], na.rm=TRUE),
-        ## Mean S-error IT by the crit 1
-        mean(raw[5,raw[7,]==1], na.rm=TRUE),
-        ## Mean S-error IT by the crit 2
-        mean(raw[5,raw[8,]==1], na.rm=TRUE),
-        ## Mean p-value
-        mean(raw[1,], na.rm=TRUE),
-        ## Mean evidence weight for H0
-        mean(raw[2,], na.rm=TRUE) 
+    results <- c(sum(raw[6,])/nrep, # Prop rightful conclusions NHT
+                 sum(raw[7,])/nrep, # Prop rightfull conclusions IT by the criterium 1:  deltaAIC = 0 for the right model
+                 sum(raw[8,])/nrep, # Prop rightfull conclusions IT by the criterium 2: deltaAIC > 2 for all wrong models
+                 sum(raw[6,]!=raw[7,])/nrep,# Prop mismatches in conclusions NHT x IT criterium 1
+                 sum(raw[6,]!=raw[8,])/nrep,# Prop mismatches in conclusions NHT x IT crit 2
+                 mean(raw[4,raw[6,]==1], na.rm=TRUE), # Mean M-error NHT
+                 mean(raw[4,raw[7,]==1], na.rm=TRUE), # Mean M-error IT by the crit 1
+                 mean(raw[4,raw[8,]==1], na.rm=TRUE), # Mean M-error IT by the crit 2
+                 mean(raw[5,raw[6,]==1], na.rm=TRUE), # Mean S-error NHT
+                 mean(raw[5,raw[7,]==1], na.rm=TRUE), # Mean S-error IT by the crit 1
+                 mean(raw[5,raw[8,]==1], na.rm=TRUE), # Mean S-error IT by the crit 2
+                 mean(raw[1,], na.rm=TRUE), # Mean p-value
+                 mean(raw[2,], na.rm=TRUE) # Mean evidence weight for H0
                  ) 
-    names(results) <- c("p.NHT.right", "p.AIC.right", "p.AIC.right.2",
-                        "p.mismatch", "p.mismatch.2", "mean.NHT.M",
-                        "mean.AIC.M", "mean.AIC.M.2", "p.NHT.S", "p.AIC.S",
-                        "p.AIC.S.2", "mean.pvalue", "mean.wH0")
-    if(summary.only)
-        return(results)
-    if(!summary.only)
-        return(list(results=results, simulated.data=raw))
+    names(results) <- c("p.NHT.right", "p.AIC.right", "p.AIC.right.2", "p.mismatch", "p.mismatch.2", "mean.NHT.M",
+                        "mean.AIC.M", "mean.AIC.M.2", "p.NHT.S",  "p.AIC.S", "p.AIC.S.2", "mean.pvalue", "mean.wH0")
+    return(results)
 }
 
 ## Same as above, but when the null hypothesis is true
 sim.averages.null <- function(st.dev, sample.size, nrep, function.name, ...)
-    sim.averages(effect = 0, st.dev=st.dev, sample.size=sample.size,
-                 nrep=nrep, function.name=function.name, ...)
+    sim.averages(effect = 0, st.dev=st.dev, sample.size=sample.size, nrep=nrep, function.name=function.name, ...)
+

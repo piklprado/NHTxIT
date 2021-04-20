@@ -5,7 +5,8 @@ p1b <- function(data, legend = TRUE, pos.leg="bottomright",
                 AIC1 = TRUE, AIC2 = TRUE, H0= FALSE,
                 colours=c("black","red","blue"),
                 ylab="P rightfull conclusions",
-                xlab="Effect size", ylim, ...){
+                xlab="Effect size", ylim,
+                x, y1, y2, y1.col = 1, y2.col =2, ...){
     dots <- list(...)
     if(H0){
         Y <- data$SD/sqrt(data$N)
@@ -24,7 +25,12 @@ p1b <- function(data, legend = TRUE, pos.leg="bottomright",
                      range(c(p.NHT.right,p.AIC.right, p.AIC.right.2)))
     plot(p.NHT.right ~ Y, data=data,
          ylim= ylim,
-         xlab=xlab, ylab=ylab, col=colours[1], ...)
+         xlab=xlab, ylab=ylab, type = "n" , ...)
+    if(!missing(y1)) 
+        lines(x, y1, col = y1.col, lwd =2)
+    if(!missing(y2)) 
+        lines(x, y2, col = y2.col, lwd = 2)
+    points(p.NHT.right ~ Y, data=data, col = colours[1], ...)
     if(AIC1)
         points(p.AIC.right ~ Y, data=data, col=colours[2], ...)
     if(AIC2)

@@ -6,12 +6,12 @@ source("functions.R")
 source("plot.functions.R")
 ## Load simulation results.
 ## The R binaries with the simulation results are available under request to the authors,
-## but you can reproduce the results running the simmulations again
+## but you can reproduce the results running the simulations again
 ##(script 'simulation_rightfull_conclusions.R')
 ## Please correct file paths accordingly
 load("simulations/tresults.RData")
 load("simulations/corresults.RData")
-load("simulations/anovaresults.RData")
+load("simulations/anova2results.RData")
 load("simulations/lmresults.RData")
 
 ## Plot Parameters (from http://shinyapps.org/apps/RGraphCompendium/)
@@ -32,19 +32,23 @@ pGauss2 <- as.data.frame(t(sapply(D.seq, retrodesign2, s=1, alpha = 0.05)))
 
 
 ## Probabilities of rightfull conclusions when H0 is false
-pdf("../overleaf/figures/Fig1.pdf", width=8, height=8)
+pdf("figures/Fig1.pdf", width=8, height=8)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
     cex.lab = 1.25, font.lab = 2, cex.axis = 1.2, bty = "l", las = 1, mfrow=c(2,2),
     oma=c(3,3,0,0))
+## T-test
 p1b(t.results, main = "t-test", AIC2=FALSE, colours=c("black","grey","grey"),
     legend=FALSE, xlab="", ylab="", cex=0.25, ylim =c(0,1))
 legend("bottomright",c("NHT","IT"), pch=19, col=c("black","darkgrey"), bty="n", cex=1.2)
+## Correlation test
 p1b(cor.results, main = "Correlation", AIC2=FALSE, colours=c("black","grey","grey"),
     legend=FALSE, xlab="", ylab="", cex=0.25, ylim =c(0,1))
-p1b(anova.results, main = "ANOVA", AIC1=FALSE, colours=c("black","grey","grey"),
+## Anova
+p1b(anova.results, main = "ANOVA", AIC2=TRUE, colours=c("black","grey","grey"),
     legend=FALSE, xlab="", ylab="", cex=0.25, ylim =c(0,1))
+## Linear regression    
 p1b(lm.results, main = "Linear regression", AIC1=FALSE, colours=c("black","grey","grey"),
     legend=FALSE, xlab="", ylab="", cex=0.25, ylim =c(0,1))
 mtext("Effect Size", side=1, outer=TRUE, cex=2, line=0)
@@ -52,7 +56,7 @@ mtext("Proportion of rightfull conclusions", side=2, outer=TRUE, cex=2, line=0.5
 dev.off()
 
 ## M-errors
-pdf("../overleaf/figures/Fig2.pdf", width=8, height=8)
+pdf("figures/Fig2.pdf", width=8, height=8)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -72,7 +76,7 @@ mtext("Mean M-error rate", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
 
 ## S-errors
-pdf("../overleaf/figures/Fig3.pdf", width=8, height=8)
+pdf("figures/Fig3.pdf", width=8, height=8)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -92,7 +96,7 @@ mtext("Proportion of S-error", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
 
 ## P x Akaike weights
-pdf("../overleaf/figures/Fig4.pdf", width=8, height=8)
+pdf("figures/Fig4.pdf", width=8, height=8)
 par(cex.main = 1.5, lwd=2,
     mar = c(5.5, 5.5, 4, 2) + 0.1,
     mgp = c(3.5, 0.5, 0), 
@@ -126,11 +130,35 @@ st <- function(n, m) sqrt((n-1)*(exp(2*m/n)-1))
 ## Critical t for a certain significance value, from the t distribution
 cp <- function(n, alpha) qt(p= 1-alpha/2, df = n-1)
 ## Fig S1
-pdf("../overleaf/figures/FigS1.pdf")
-par(cex.axis=1.5, cex.lab=1.75, las=1, mar = c(5, 6, 4, 2), mgp = c(4,1,0), lwd=1.5)
-curve(cp(x, alpha = 0.05), 3, 30, xlab= "sample size", ylab="| t | value to reject H0", lty=2, lwd=2)
-curve(st(x, m=2), add=TRUE, lwd = 2)
-legend("topright", c("t-test", "IT test"), lty=2:1, bty="n", cex=1.5)
+pdf("figures/FigS1.pdf", width = 9 , height = 4.5)
+##par(cex.axis=1.5, cex.lab=1.75, las=1, mar = c(5, 6, 4, 2), mgp = c(4,1,0), lwd=1.5, mfrow = c(1,2))
+par(cex.axis=1.25, cex.lab=1.35, las=1, mar = c(5, 6, 4, 2), mgp = c(4,1,0), mfrow = c(1,2))
+## Asymptotic approximation by LRT test (Aho,2017)
+## t-test and Aho's heuristic
+##cores  <- c("grey", "darkgrey")
+cores <- rainbow(3, alpha = 0.1)[c(1,3)]
+## Values of the effect
+x <- seq(0.01,8, by=0.1)
+## NHT
+y1 <- pchisq(1.96^2, df=1, ncp=x^2, lower=FALSE)
+## IT
+y2 <- pchisq(2, df=1, ncp=x^2, lower=FALSE)
+p1b(t.results, 
+    AIC2=FALSE,
+    colours = cores,
+    legend=FALSE,
+    xlab="Effect Size",
+    ylab="Proportion of rightfull conclusions",
+    cex=0.5,
+    ylim = c(0,1))
+legend("bottomright",c("NHT","IT"), pch=1, col = c("red","blue"), bty="n", cex=1.2)
+## Adds the lines for Aho's p of righfull conclusion to the plot
+lines(x,y1, col = "darkred", lwd = 1.5)
+lines(x,y2, col="darkblue", lwd = 1.5)
+## Tc test
+curve(cp(x, alpha = 0.05), 3, 30, xlab= "sample size", ylab="| t | value to reject H0", lwd=2, col = "darkred")
+curve(st(x, m=2), add=TRUE, lwd = 2, col = "darkblue")
+legend("topright", c("t-test", "IT test"), col = c("darkblue", "darkred"), lty=1, bty="n", cex=1.2)
 dev.off()
 
 
@@ -139,7 +167,7 @@ x <- seq(-4,5.8,by=0.01)
 y1 <- dt(x, df=20)
 y2 <- dt(x, df=20, ncp = 1)
 a <- c(0.7,2.5)
-pdf("../overleaf/figures/FigS2.pdf", width=8, height=6.5)
+pdf("figures/FigS2.pdf", width=8, height=6.5)
 par(cex= 1.25, lwd=2)
 #par(cex.main = 1.5, mar = c(5, 6, 4, 4) + 0.1, mgp = c(3.5, 1, 0), 
 #    cex.lab = 1.5, font.lab = 2, cex.axis = 1.3, cex=2)
@@ -166,7 +194,7 @@ dev.off()
 
 
 ## P rightfull conclusions for both IT criteria
-pdf("../overleaf/figures/FigS3.pdf", width=12, height=4.5)
+pdf("figures/FigS3.pdf", width=12, height=4.5)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -189,7 +217,7 @@ dev.off()
 
 
 ## M-Errors
-pdf("../overleaf/figures/FigS4.pdf", width=12, height=4.5)
+pdf("figures/FigS4.pdf", width=12, height=4.5)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -211,7 +239,7 @@ mtext("Mean M-error rate", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
 
 ## S-Errors
-pdf("../overleaf/figures/FigS5.pdf", width=12, height=4.5)
+pdf("figures/FigS5.pdf", width=12, height=4.5)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -231,3 +259,5 @@ p4b(lm.colin.results, main = "Linear regression, collinearity",
 mtext("Effect Size", side=1, outer=TRUE, cex=2, line=0)
 mtext("Proportion of S-error", side=2, outer=TRUE, cex=2, line=0.5, las=0)
 dev.off()
+
+
