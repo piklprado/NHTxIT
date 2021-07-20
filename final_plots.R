@@ -33,6 +33,7 @@ pGauss2 <- as.data.frame(t(sapply(D.seq, retrodesign2, s=1, alpha = 0.05)))
 
 ## Probabilities of rightfull conclusions when H0 is false
 pdf("figures/Fig1.pdf", width=8, height=8)
+##png("figures/png300dpi/Fig1.png", height=1000, width = 1000, res = 300)
 par(cex.main = 1.5, lwd=2,
     mar = c(5, 4, 4, 2) + 0.1,
     mgp = c(3.5, 1, 0), 
@@ -46,7 +47,7 @@ legend("bottomright",c("NHT","IT"), pch=19, col=c("black","darkgrey"), bty="n", 
 p1b(cor.results, main = "Correlation", AIC2=FALSE, colours=c("black","grey","grey"),
     legend=FALSE, xlab="", ylab="", cex=0.25, ylim =c(0,1))
 ## Anova
-p1b(anova.results, main = "ANOVA", AIC2=TRUE, colours=c("black","grey","grey"),
+p1b(anova.results, main = "ANOVA", AIC1=FALSE, colours=c("black","grey","grey"),
     legend=FALSE, xlab="", ylab="", cex=0.25, ylim =c(0,1))
 ## Linear regression    
 p1b(lm.results, main = "Linear regression", AIC1=FALSE, colours=c("black","grey","grey"),
@@ -136,7 +137,7 @@ par(cex.axis=1.25, cex.lab=1.35, las=1, mar = c(5, 6, 4, 2), mgp = c(4,1,0), mfr
 ## Asymptotic approximation by LRT test (Aho,2017)
 ## t-test and Aho's heuristic
 ##cores  <- c("grey", "darkgrey")
-cores <- rainbow(3, alpha = 0.1)[c(1,3)]
+cores <- rainbow(3, alpha = 0.5)[c(1,3)]
 ## Values of the effect
 x <- seq(0.01,8, by=0.1)
 ## NHT
@@ -149,12 +150,12 @@ p1b(t.results,
     legend=FALSE,
     xlab="Effect Size",
     ylab="Proportion of rightfull conclusions",
-    cex=0.5,
+    cex=0.1,
     ylim = c(0,1))
-legend("bottomright",c("NHT","IT"), pch=1, col = c("red","blue"), bty="n", cex=1.2)
+legend("bottomright",c("NHT","IT"), pch=19, col = c("red","blue"), bty="n", cex=1.2)
 ## Adds the lines for Aho's p of righfull conclusion to the plot
-lines(x,y1, col = "darkred", lwd = 1.5)
-lines(x,y2, col="darkblue", lwd = 1.5)
+lines(x,y1, col = "darkred", lwd = 2)
+lines(x,y2, col="darkblue", lwd = 2)
 ## Tc test
 curve(cp(x, alpha = 0.05), 3, 30, xlab= "sample size", ylab="| t | value to reject H0", lwd=2, col = "darkred")
 curve(st(x, m=2), add=TRUE, lwd = 2, col = "darkblue")
